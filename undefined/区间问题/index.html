@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>区间问题 | nu∞-记录</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="校门外的树🔗 12345int ans &#x3D; 0;ans +&#x3D; r - L + 1;&#x2F;&#x2F;(循环结束后必须再来一个这个)int res &#x3D; n + 1;res -&#x3D; r - l + 1;  12345678910111213sort(p, p + m, cmp);int ans &#x3D; 0;int L &#x3D; p[0].first, r &#x3D; p[0].second;for (int i &#x3D; 1; i &amp;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="区间问题">
+<meta property="og:url" content="http://example.com/undefined/%E5%8C%BA%E9%97%B4%E9%97%AE%E9%A2%98/index.html">
+<meta property="og:site_name" content="nu∞-记录">
+<meta property="og:description" content="校门外的树🔗 12345int ans &#x3D; 0;ans +&#x3D; r - L + 1;&#x2F;&#x2F;(循环结束后必须再来一个这个)int res &#x3D; n + 1;res -&#x3D; r - l + 1;  12345678910111213sort(p, p + m, cmp);int ans &#x3D; 0;int L &#x3D; p[0].first, r &#x3D; p[0].second;for (int i &#x3D; 1; i &amp;">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="c:\Users\86188\AppData\Roaming\Typora\typora-user-images\image-20220205223536515.png">
+<meta property="article:published_time" content="2022-02-16T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-05-18T13:29:07.091Z">
+<meta property="article:author" content="桉念">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="c:\Users\86188\AppData\Roaming\Typora\typora-user-images\image-20220205223536515.png">
+  
+    <link rel="alternate" href="/atom.xml" title="nu∞-记录" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">nu∞-记录</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-区间问题" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/undefined/%E5%8C%BA%E9%97%B4%E9%97%AE%E9%A2%98/" class="article-date">
+  <time class="dt-published" datetime="2022-02-16T16:00:00.000Z" itemprop="datePublished">2022-02-17</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      区间问题
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <img src="C:\Users\86188\AppData\Roaming\Typora\typora-user-images\image-20220205223536515.png" alt="image-20220205223536515" style="zoom: 67%;" />
+
+<p><a target="_blank" rel="noopener" href="https://www.acwing.com/problem/content/424/">校门外的树🔗</a></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> ans = <span class="number">0</span>;</span><br><span class="line">ans += r - L + <span class="number">1</span>;<span class="comment">//(循环结束后必须再来一个这个)</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> res = n + <span class="number">1</span>;</span><br><span class="line">res -= r - l + <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sort</span>(p, p + m, cmp);</span><br><span class="line"><span class="type">int</span> ans = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> L = p[<span class="number">0</span>].first, r = p[<span class="number">0</span>].second;</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt; m; ++i) &#123;</span><br><span class="line">	<span class="keyword">if</span> (p[i].first &gt; r) &#123;</span><br><span class="line">		ans += r - L + <span class="number">1</span>;</span><br><span class="line">		L = p[i].first;</span><br><span class="line">		r = p[i].second;</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		r = <span class="built_in">max</span>(p[i].second, r);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">ans += r - L + <span class="number">1</span>;		cout &lt;&lt; l + <span class="number">1</span> - ans&lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://www.acwing.com/problem/content/805/">区间合并🔗</a></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">几个区间</span><br><span class="line">	<span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt; m; ++i) &#123;</span><br><span class="line">		<span class="keyword">if</span> (p[i].first &gt; r) &#123;</span><br><span class="line">			++ans;</span><br><span class="line">			L = p[i].first;</span><br><span class="line">			r = p[i].second;</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			r = <span class="built_in">max</span>(p[i].second, r);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	cout &lt;&lt; ans + <span class="number">1</span> &lt;&lt; endl;<span class="comment">//(毕竟最后一个无论如何都要算)</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="二维的"><a href="#二维的" class="headerlink" title="二维的"></a>二维的</h4><p><a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P3397">地毯🔗</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.acwing.com/problem/content/3206/">画图🔗</a></p>
+<p>差分： O(1)</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">		<span class="comment">//++a, ++b;视具体情况而定</span></span><br><span class="line">		++g[a][b];</span><br><span class="line">		--g[c + <span class="number">1</span>][b];</span><br><span class="line">		--g[a][d + <span class="number">1</span>];</span><br><span class="line">		++g[c + <span class="number">1</span>][d + <span class="number">1</span>];</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= <span class="number">100</span> + <span class="number">1</span>; ++i) &#123;</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">1</span>; j &lt;= <span class="number">100</span> + <span class="number">1</span>; ++j) &#123;</span><br><span class="line">			g[i][j] += g[i - <span class="number">1</span>][j] + g[i][j - <span class="number">1</span>] - g[i - <span class="number">1</span>][j - <span class="number">1</span>];</span><br></pre></td></tr></table></figure>
+
+<p>前缀和： O(mn + n^2)</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">	<span class="type">int</span> a, b, c, d;</span><br><span class="line">	cin &gt;&gt; a &gt;&gt; b &gt;&gt; c &gt;&gt; d;</span><br><span class="line">	<span class="keyword">for</span> (<span class="type">int</span> j = a; j &lt;= c - <span class="number">1</span>; ++j) &#123;<span class="comment">//c-1 / c</span></span><br><span class="line">		g[j][b]++;</span><br><span class="line">		g[j][d]--;<span class="comment">//d / d + 1</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt;= <span class="number">100</span> + <span class="number">1</span>; ++i) &#123;</span><br><span class="line">	<span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt;= <span class="number">100</span> + <span class="number">1</span>; ++j) &#123;</span><br><span class="line">		ans += g[i][j];</span><br><span class="line">		an[i][j] = ans;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再复杂 ： 1e5 扫描线+线段树（在差分不可用情况下）</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/undefined/%E5%8C%BA%E9%97%B4%E9%97%AE%E9%A2%98/" data-id="clht6awn2000b6ou2gx2b849x" data-title="区间问题" class="article-share-link">Share</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/undefined/%E7%A6%BB%E6%95%A3%E5%8C%96/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          离散化
+        
+      </div>
+    </a>
+  
+  
+    <a href="/undefined/BFS/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">May 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/03/">March 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/12/">December 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/01/">January 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/undefined/joisc2014/">2882. 「JOISC 2014 Day4」两个人的星座</a>
+          </li>
+        
+          <li>
+            <a href="/undefined/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/undefined/linee/">linee</a>
+          </li>
+        
+          <li>
+            <a href="/undefined/lca/">lca(最近公共祖先)</a>
+          </li>
+        
+          <li>
+            <a href="/undefined/tree-min/">最小生成树</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 桉念<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

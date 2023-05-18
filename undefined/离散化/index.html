@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>离散化 | nu∞-记录</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="不是算法，只是一个降低复杂度的Trick  把无限空间中有限的个体映射到有限的空间中去，以此提高算法的时空效率 你有一个10^3个数据，数据大小在10^12之内，如果直接开一个10^12的数组就肯定会超，而开一个10^3的long long数组就不会超。 map可以实现离散化 所以，我们只需要先把数据存在一个结构体数组里面，对数据排序后再将结构体数组中的数据位置转存到另一个数组上就完全可以避免M">
+<meta property="og:type" content="article">
+<meta property="og:title" content="离散化">
+<meta property="og:url" content="http://example.com/undefined/%E7%A6%BB%E6%95%A3%E5%8C%96/index.html">
+<meta property="og:site_name" content="nu∞-记录">
+<meta property="og:description" content="不是算法，只是一个降低复杂度的Trick  把无限空间中有限的个体映射到有限的空间中去，以此提高算法的时空效率 你有一个10^3个数据，数据大小在10^12之内，如果直接开一个10^12的数组就肯定会超，而开一个10^3的long long数组就不会超。 map可以实现离散化 所以，我们只需要先把数据存在一个结构体数组里面，对数据排序后再将结构体数组中的数据位置转存到另一个数组上就完全可以避免M">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-03-02T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-05-18T13:28:45.712Z">
+<meta property="article:author" content="桉念">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="nu∞-记录" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">nu∞-记录</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-离散化" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/undefined/%E7%A6%BB%E6%95%A3%E5%8C%96/" class="article-date">
+  <time class="dt-published" datetime="2022-03-02T16:00:00.000Z" itemprop="datePublished">2022-03-03</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      离散化
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>不是算法，只是一个降低复杂度的Trick</p>
+</blockquote>
+<p>把无限空间中有限的个体映射到有限的空间中去，以此提高算法的时空效率</p>
+<p>你有一个10^3个数据，数据大小在10^12之内，如果直接开一个10^12的数组就肯定会超，而开一个10^3的long long数组就不会超。</p>
+<p><strong>map可以实现离散化</strong></p>
+<p>所以，我们只需要先把数据存在一个<strong>结构体数组</strong>里面，对数据排序后再将结构体数组中的数据<strong>位置</strong>转存到另一个数组上就完全可以避免MLE</p>
+<p>题目只<strong>需要各元素之间的大小关系而与元素具体大小无关</strong>（相对关系）</p>
+<p>排序之后，枚举着放回原数组</p>
+<p>用一个结构体存下原数和位置，按照原数排序</p>
+<p>结构体里面写个重载，也可以写一个比较函数</p>
+<p>最后离散化后数在b[]里面</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">复杂度更优，但不能处理重复元素</span><br><span class="line"><span class="type">int</span> b[<span class="number">500010</span>];离散后的数据</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">in</span>&#123;</span><br><span class="line">  <span class="type">int</span> shu;实际元素大小</span><br><span class="line">  <span class="type">int</span> weizhi;元素所在的位置</span><br><span class="line">&#125;dian[<span class="number">500010</span>];</span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">cmp</span><span class="params">(in a , in b)</span></span>&#123;</span><br><span class="line">  <span class="keyword">if</span>(a.shu == b.shu)  <span class="keyword">return</span> a.weizhi &lt; b.weizhi;</span><br><span class="line">  <span class="keyword">return</span> a.shu &lt; b.shu;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span> ; i &lt;= n ; i ++) &#123;</span><br><span class="line">	  cin &gt;&gt; dian[i].shu;</span><br><span class="line">	  dian[i].weizhi = i;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">sort</span>(dian + <span class="number">1</span> , dian + <span class="number">1</span> + n , cmp);</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span> ; i &lt;= n ; i ++)&#123;</span><br><span class="line">	  b[dian[i].weizhi] = i;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	v: <span class="number">3</span> <span class="number">6</span> <span class="number">5</span> <span class="number">10</span> <span class="number">8</span></span><br><span class="line">　　id:<span class="number">1</span> <span class="number">2</span> <span class="number">3</span> <span class="number">4</span> <span class="number">5</span></span><br><span class="line"></span><br><span class="line">　　排序以后：</span><br><span class="line">　　v: <span class="number">3</span> <span class="number">5</span> <span class="number">6</span> <span class="number">8</span> <span class="number">10</span></span><br><span class="line">　　id:<span class="number">1</span> <span class="number">3</span> <span class="number">2</span> <span class="number">5</span> <span class="number">4</span></span><br><span class="line"></span><br><span class="line">　　所以离散化以后：</span><br><span class="line">　　v: <span class="number">3</span> <span class="number">5</span> <span class="number">6</span> <span class="number">8</span> <span class="number">10</span></span><br><span class="line">　　id:<span class="number">1</span> <span class="number">3</span> <span class="number">2</span> <span class="number">5</span> <span class="number">4</span></span><br><span class="line">　　rk:<span class="number">1</span> <span class="number">2</span> <span class="number">3</span> <span class="number">4</span> <span class="number">5</span></span><br><span class="line"></span><br><span class="line">　　在按原来的顺序排列：</span><br><span class="line">　　v: <span class="number">3</span> <span class="number">6</span> <span class="number">5</span> <span class="number">10</span> <span class="number">8</span></span><br><span class="line">　　rk:<span class="number">1</span> <span class="number">3</span> <span class="number">2</span> <span class="number">5</span> <span class="number">4</span></span><br></pre></td></tr></table></figure>
+
+<p>用一个辅助的数组把你要离散的所有数据存下来。</p>
+<p>然后排序，排序是为了后面的二分。</p>
+<p>去重，因为我们要保证相同的元素离散化后数字相同。</p>
+<p>再用二分把离散化后的数字放回原数组。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;algorithm&gt;</span> <span class="comment">// 头文件 </span></span></span><br><span class="line"><span class="comment">//n 原数组大小 num 原数组中的元素 lsh 离散化的数组 cnt 离散化后的数组大小 </span></span><br><span class="line"><span class="type">int</span> lsh[MAXN] , cnt , num[MAXN] , n;</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>; i&lt;=n; i++) &#123;</span><br><span class="line">	<span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>,&amp;num[i]);</span><br><span class="line">	lsh[i] = num[i];	</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">sort</span>(lsh+<span class="number">1</span> , lsh+n+<span class="number">1</span>);</span><br><span class="line">cnt = <span class="built_in">unique</span>(lsh+<span class="number">1</span> , lsh+n+<span class="number">1</span>) - lsh - <span class="number">1</span>; </span><br><span class="line"><span class="comment">//unique是c++自带的一个函数，表示对一个数列去重,然后返回不重复的元素个数，当然在后面要减去首地   址</span></span><br><span class="line"><span class="comment">//原序列：6 9 4 6 4</span></span><br><span class="line"><span class="comment">//排序后：4 4 6 6 9</span></span><br><span class="line"><span class="comment">//unique（元素去掉重复的）后：4 6 9 6 9</span></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>; i&lt;=n; i++)</span><br><span class="line">	num[i] = <span class="built_in">lower_bound</span>(lsh+<span class="number">1</span> , lsh+cnt+<span class="number">1</span> , num[i]) - lsh;<span class="comment">//离散化之后的排名（即新编号）</span></span><br><span class="line"></span><br><span class="line">&#123;<span class="number">6</span>,<span class="number">8</span>,<span class="number">4</span>,<span class="number">9</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">4</span>&#125;，首先排序后得到&#123;<span class="number">4</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>&#125;，去重&#123;<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>&#125;，然后原序列就变成了&#123;<span class="number">3</span>,<span class="number">5</span>,<span class="number">1</span>,<span class="number">6</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">1</span>&#125;。</span><br></pre></td></tr></table></figure>
+
+<p>注意事项：</p>
+<p>1.去重并不是把数组中的元素删去，而是重复的部分元素在数组末尾，去重之后数组的大小要减一</p>
+<p>2.二分的时候，注意二分的区间范围，一定是离散化后的区间</p>
+<p>3.如果需要多个数组同时离散化，那就把这些数组中的数都用数组存下来</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//mp[i]=j;i表示这个数字,j表示这个数所在的位置</span></span><br><span class="line">map&lt;<span class="type">int</span>,<span class="type">int</span>&gt; mp;</span><br><span class="line"><span class="type">int</span> n,c[maxn],st[maxn];</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>,&amp;c[i]); </span><br><span class="line">    st[i]=c[i];</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">sort</span>(st+<span class="number">1</span>,st+n+<span class="number">1</span>);</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) mp[st[i]]=i;</span><br><span class="line"></span><br><span class="line">所以对于一个无序数组c,我们找c中任意一个数都可以快速知道它是第几大的数,且mp.<span class="built_in">size</span>()的值就是</span><br><span class="line">数组c的不重复的元素个数</span><br></pre></td></tr></table></figure>
+
+<p>题：</p>
+<p><a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P1204">[USACO1.2]挤牛奶Milking Cows</a></p>
+<p>人为离散化：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">v.<span class="built_in">erase</span>(<span class="built_in">unique</span>(v.<span class="built_in">begin</span>(), v.<span class="built_in">end</span>()), v.<span class="built_in">end</span>());<span class="comment">//去重</span></span><br><span class="line">(v.<span class="built_in">erase</span>(pos, v.<span class="built_in">end</span>()))</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/undefined/%E7%A6%BB%E6%95%A3%E5%8C%96/" data-id="clht6awn8000i6ou2deble21i" data-title="离散化" class="article-share-link">Share</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/undefined/%E5%B0%8F%E5%87%BD%E6%95%B0/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          小函数
+        
+      </div>
+    </a>
+  
+  
+    <a href="/undefined/%E5%8C%BA%E9%97%B4%E9%97%AE%E9%A2%98/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">区间问题</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">May 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/03/">March 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/12/">December 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/01/">January 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/undefined/joisc2014/">2882. 「JOISC 2014 Day4」两个人的星座</a>
+          </li>
+        
+          <li>
+            <a href="/undefined/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/undefined/linee/">linee</a>
+          </li>
+        
+          <li>
+            <a href="/undefined/lca/">lca(最近公共祖先)</a>
+          </li>
+        
+          <li>
+            <a href="/undefined/tree-min/">最小生成树</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 桉念<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
