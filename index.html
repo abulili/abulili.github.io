@@ -71,6 +71,296 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-vue3.2后台管理心得" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/undefined/vue3.2%E5%90%8E%E5%8F%B0%E7%AE%A1%E7%90%86%E5%BF%83%E5%BE%97/" class="article-date">
+  <time class="dt-published" datetime="2023-09-05T09:18:16.000Z" itemprop="datePublished">2023-09-05</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/undefined/vue3.2%E5%90%8E%E5%8F%B0%E7%AE%A1%E7%90%86%E5%BF%83%E5%BE%97/">树的中/后序遍历（简易）</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>思维导图说不清楚的放在这里</p>
+<p>vue-cli: 基于插件的架构，所以依赖名：<code>@vue/cli-plugin-</code> 开头</p>
+<p>插件可以修改 webpack 的内部配置，也可以向 <code>vue-cli-service</code> 注入命令</p>
+<p>以vue-cli-service访问</p>
+<p>不是每个应用都需要是一个单页应用。Vue CLI 支持使用 <a target="_blank" rel="noopener" href="https://cli.vuejs.org/zh/config/#pages"><code>vue.config.js</code> 中的 <code>pages</code> 选项</a>构建一个多页面的应用。构建好的应用将会在不同的入口之间高效共享通用的 chunk 以获得最佳的加载性能。</p>
+<p>静态资源可以通过两种方式进行处理：</p>
+<ul>
+<li>在 JavaScript 被导入或在 template&#x2F;CSS 中通过相对路径被引用。这类引用会被 webpack 处理。</li>
+<li>放置在 <code>public</code> 目录下或通过绝对路径被引用。这类资源将会直接被拷贝，而不会经过 webpack 的处理。</li>
+</ul>
+<p>当你在 JavaScript、CSS 或 <code>*.vue</code> 文件中使用相对路径 (必须以 <code>.</code> 开头) 引用一个静态资源时，该资源将会被包含进入 webpack 的依赖图中。在其编译过程中，所有诸如 <code>&lt;img src=&quot;...&quot;&gt;</code>、<code>background: url(...)</code> 和 CSS <code>@import</code> 的资源 URL <strong>都会被解析为一个模块依赖</strong>。</p>
+<p>例如，<code>url(./image.png)</code> 会被翻译为 <code>require(&#39;./image.png&#39;)</code>，而：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;img src=&quot;./image.png&quot;&gt;</span><br></pre></td></tr></table></figure>
+
+<p>将会被编译到：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">h(&#x27;img&#x27;, &#123; attrs: &#123; src: require(&#x27;./image.png&#x27;) &#125;&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>在其内部，我们通过 webpack 的 <a target="_blank" rel="noopener" href="https://webpack.js.org/guides/asset-modules/">Assets Modules</a> 配置，用版本哈希值和正确的公共基础路径来决定最终的文件路径，并将小于 8KiB 的资源内联，以减少 HTTP 请求的数量。</p>
+<p>你可以通过 <a target="_blank" rel="noopener" href="https://cli.vuejs.org/zh/config/#chainwebpack">chainWebpack</a> 调整内联文件的大小限制。例如，下列代码会将内联图片资源限制设置为 4KiB：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// vue.config.js</span><br><span class="line">module.exports = &#123;</span><br><span class="line">  chainWebpack: config =&gt; &#123;</span><br><span class="line">    config.module</span><br><span class="line">      .rule(&#x27;images&#x27;)</span><br><span class="line">        .set(&#x27;parser&#x27;, &#123;</span><br><span class="line">          dataUrlCondition: &#123;</span><br><span class="line">            maxSize: 4 * 1024 // 4KiB</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="URL-转换规则"><a href="#URL-转换规则" class="headerlink" title="URL 转换规则 #"></a>URL 转换规则 <a target="_blank" rel="noopener" href="https://cli.vuejs.org/zh/guide/html-and-static-assets.html#url-%E8%BD%AC%E6%8D%A2%E8%A7%84%E5%88%99">#</a></h3><ul>
+<li><p>如果 URL 是一个绝对路径 (例如 <code>/images/foo.png</code>)，它将会被保留不变。</p>
+</li>
+<li><p>如果 URL 以 <code>.</code> 开头，它会作为一个相对模块请求被解释且基于你的文件系统中的目录结构进行解析。</p>
+</li>
+<li><p>如果 URL 以 <code>~</code> 开头，其后的任何内容都会作为一个模块请求被解析。这意味着你甚至可以引用 Node 模块中的资源：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;img src=&quot;~some-npm-package/foo.png&quot;&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如果 URL 以 <code>@</code> 开头，它也会作为一个模块请求被解析。它的用处在于 Vue CLI 默认会设置一个指向 <code>&lt;projectRoot&gt;/src</code> 的别名 <code>@</code>。**(仅作用于模版中)**</p>
+</li>
+</ul>
+<p>任何放置在 <code>public</code> 文件夹的静态资源都会被简单的复制，而不经过 webpack。你需要通过绝对路径来引用它们。</p>
+<p>注意我们推荐将资源作为你的模块依赖图的一部分导入，这样它们会通过 webpack 的处理并获得如下好处：</p>
+<ul>
+<li>脚本和样式表会被压缩且打包在一起，从而避免额外的网络请求。</li>
+<li>文件丢失会直接在编译时报错，而不是到了用户端才产生 404 错误。</li>
+<li>最终生成的文件名包含了内容哈希，因此你不必担心浏览器会缓存它们的老版本。</li>
+</ul>
+<p><code>public</code> 目录提供的是一个<strong>应急手段</strong>，当你通过绝对路径引用它时，留意应用将会部署到哪里。如果你的应用没有部署在域名的根部，那么你需要为你的 URL 配置 <a target="_blank" rel="noopener" href="https://cli.vuejs.org/zh/config/#publicpath">publicPath</a> </p>
+<p>在模板中，你首先需要向你的组件传入基础 URL：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">data () &#123;</span><br><span class="line">  return &#123;</span><br><span class="line">    publicPath: process.env.BASE_URL</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;img :src=&quot;`$&#123;publicPath&#125;my-image.png`&quot;&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="何时使用-public-文件夹"><a href="#何时使用-public-文件夹" class="headerlink" title="何时使用 public 文件夹 #"></a>何时使用 <code>public</code> 文件夹 <a target="_blank" rel="noopener" href="https://cli.vuejs.org/zh/guide/html-and-static-assets.html#%E4%BD%95%E6%97%B6%E4%BD%BF%E7%94%A8-public-%E6%96%87%E4%BB%B6%E5%A4%B9">#</a></h3><ul>
+<li>你需要在构建输出中指定一个文件的名字。</li>
+<li>你有上千个图片，需要动态引用它们的路径。</li>
+<li>有些库可能和 webpack 不兼容，这时你除了将其用一个独立的 <code>&lt;script&gt;</code> 标签引入没有别的选择。</li>
+</ul>
+<p>非必要不用public文件夹</p>
+<p>调整 webpack 配置最简单的方式就是在 <code>vue.config.js</code> 中的 <code>configureWebpack</code> 选项提供一个对象：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// vue.config.js</span><br><span class="line">module.exports = &#123;</span><br><span class="line">  configureWebpack: &#123;</span><br><span class="line">    plugins: [</span><br><span class="line">      new MyAwesomeWebpackPlugin()</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该对象将会被 <a target="_blank" rel="noopener" href="https://github.com/survivejs/webpack-merge">webpack-merge</a> 合并入最终的 webpack 配置。</p>
+<p>警告</p>
+<p>有些 webpack 选项是基于 <code>vue.config.js</code> 中的值设置的，所以不能直接修改。例如你应该修改 <code>vue.config.js</code> 中的 <code>outputDir</code> 选项而不是修改 <code>output.path</code>；你应该修改 <code>vue.config.js</code> 中的 <code>publicPath</code> 选项而不是修改 <code>output.publicPath</code>。这样做是因为 <code>vue.config.js</code> 中的值会被用在配置里的多个地方，以确保所有的部分都能正常工作在一起。</p>
+<p>如果你需要基于环境有条件地配置行为，或者想要直接修改配置，那就换成一个函数 (该函数会在环境变量被设置之后懒执行)。该方法的第一个参数会收到已经解析好的配置。在函数内，你可以直接修改配置，或者返回一个将会被合并的对象：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">// vue.config.js</span><br><span class="line">module.exports = &#123;</span><br><span class="line">  configureWebpack: config =&gt; &#123;</span><br><span class="line">    if (process.env.NODE_ENV === &#x27;production&#x27;) &#123;</span><br><span class="line">      // 为生产环境修改配置...</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      // 为开发环境修改配置...</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Vue CLI 内部的 webpack 配置是通过 <a target="_blank" rel="noopener" href="https://github.com/mozilla-neutrino/webpack-chain">webpack-chain</a> 维护的。这个库提供了一个 webpack 原始配置的上层抽象，使其可以定义具名的 loader 规则和具名插件，并有机会在后期进入这些规则并对它们的选项进行修改。</p>
+<p>你可以通过传递 <code>--mode</code> 选项参数为命令行覆写默认的模式。例如，如果你想要在构建命令中使用开发环境变量：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vue-cli-service build --mode development</span><br></pre></td></tr></table></figure>
+
+<p>—官方文档</p>
+<hr>
+<p><code>package.json</code> 文件里的 <code>browserslist</code> 字段 (或一个单独的 <code>.browserslistrc</code> 文件)，指定了项目的目标浏览器的范围。这个值会被 <a target="_blank" rel="noopener" href="https://new.babeljs.io/docs/en/next/babel-preset-env.html">@babel&#x2F;preset-env</a> 和 <a target="_blank" rel="noopener" href="https://github.com/postcss/autoprefixer">Autoprefixer</a> 用来确定需要转译的 JavaScript 特性和需要添加的 CSS 浏览器前缀。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&quot;config&quot;: &#123;</span><br><span class="line">    &quot;commitizen&quot;: &#123;</span><br><span class="line">      &quot;path&quot;: &quot;node_modules/cz-customizable&quot;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<p>commitizen” 配置项用于指定使用的 Commitizen 工具的路径。Commitizen 是一个用于规范化提交信息的工具，它有助于生成符合规范的 Git 提交消息，使项目的提交历史更加清晰和易于理解。具体来说：</p>
+<p>&#x2F;&#x2F; “path” 指定了 Commitizen 工具的路径，这里指定为 “node_modules&#x2F;cz-customizable”。这表示项目将使用 cz-customizable 包中的 Commitizen 工具。</p>
+<p> 可以使用 <code>git cz</code> 命令来生成规范化的提交消息，然后按照提示填写相应的信息。</p>
+<hr>
+<p><code>service.interceptors.response.use</code> 是 Axios 中的一个拦截器（interceptor）用于在发送网络请求后，在接收响应之前对响应数据进行处理。这是一个非常有用的功能，可用于全局或局部地处理响应数据，例如处理错误、添加通用的处理逻辑等。</p>
+<p>具体来说，<code>service.interceptors.response.use</code> 通常用于以下目的：</p>
+<ol>
+<li><strong>处理成功的响应数据：</strong>您可以在这个拦截器中处理成功的响应数据，例如提取有用的数据或进行某些后续操作。如果您的网络请求成功，那么这个拦截器将接收到服务器返回的响应数据。</li>
+<li><strong>处理错误响应：</strong>您可以在这个拦截器中处理请求失败或服务器返回的错误。这包括处理 HTTP 错误状态码（如 404、500 等）或应用程序定义的错误（例如，如果服务器返回一个错误的 JSON 格式或特定错误消息）。</li>
+<li><strong>对响应进行通用处理：</strong>您可以在这里执行一些通用的处理，例如显示通知、记录请求和响应等。这可以用于全局错误处理或应用程序级别的通用逻辑。</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">service.interceptors.response.use(</span><br><span class="line">  // 第一个参数处理成功响应</span><br><span class="line">  function (response) &#123;</span><br><span class="line">    // 处理成功的响应逻辑</span><br><span class="line">    return response;</span><br><span class="line">  &#125;,</span><br><span class="line">  // 第二个参数处理错误响应</span><br><span class="line">  function (error) &#123;</span><br><span class="line">    // 处理错误响应逻辑</span><br><span class="line">    return Promise.reject(error);</span><br><span class="line">  &#125;</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><code>service.interceptors.request.use</code> 是 Axios 中用于添加请求拦截器的方法，它允许您在发送请求之前对请求进行修改或添加自定义逻辑。让我详细解释它的意义：</p>
+<ol>
+<li><code>service</code>: 这是一个之前通过 <code>axios.create(&#123;&#125;)</code> 创建的 Axios 实例，它代表了一个可以用于发起网络请求的对象。</li>
+<li><code>interceptors</code>: Axios 拥有请求拦截器和响应拦截器，这里使用的是请求拦截器。拦截器允许您在请求发送或响应返回时执行一些操作。</li>
+<li><code>request.use(callback, errorCallback)</code>: 这个方法用于添加一个请求拦截器，其中 <code>callback</code> 是一个函数，它会在发送请求之前执行。<code>errorCallback</code> 是一个可选的函数，它会在请求拦截器发生错误时执行。</li>
+</ol>
+<p>在具体的代码中，您可以看到以下操作：</p>
+<ul>
+<li><p>如果本地存储中存在一个名为 ‘token’ 的数据，就会执行请求拦截器的 <code>config</code> 回调函数，该函数用于修改请求的配置对象 <code>config</code>。</p>
+</li>
+<li><p>在这个回调函数中，首先检查了一个名为 ‘token’ 的数据，如果存在并且满足 <code>diffTokenTime()</code> 的条件，将执行以下操作：</p>
+<ul>
+<li><p>调用 <code>this.$store.dispatch(&#39;app/logout&#39;)</code> 以触发 Vuex 中的 <code>app/logout</code> 动作（通常用于用户退出登录的操作）。</p>
+</li>
+<li><p>返回一个 Promise，拒绝它并抛出一个 ‘token 失效’ 的错误。</p>
+</li>
+<li><p>如果没有满足条件，将在请求的 <code>config</code> 对象中设置 <code>Authorization</code> 头部，以包含存储在本地的 ‘token’ 数据。</p>
+</li>
+</ul>
+<p>这种方式允许您在每个请求发起之前对请求进行检查和修改。通常，它用于添加身份验证信息、设置请求头、记录请求日志等操作。</p>
+<hr>
+<p><code>utils</code> 文件夹通常用于存放各种实用工具函数、帮助函数以及通用工具类。这些工具函数和类可以在整个项目中共享和重复使用，以提高代码的可维护性和可重用性。</p>
+<p>以下是一些常见的用途，通常会在 <code>utils</code> 文件夹中放置的内容：</p>
+<ol>
+<li><strong>工具函数</strong>：包括各种通用的 JavaScript 函数，例如日期处理、字符串操作、数组操作、数学计算等。这些函数可以帮助简化代码，减少重复劳动。</li>
+<li><strong>HTTP 请求处理</strong>：如果您的应用程序需要与后端进行 HTTP 请求，您可以将处理请求和响应的功能封装到一个或多个文件中，以便在整个应用程序中重用。</li>
+<li><strong>验证函数</strong>：如果您需要对用户输入的数据进行验证，可以创建一些验证函数，以确保数据的完整性和合法性。</li>
+<li><strong>配置文件</strong>：存放一些应用程序的配置信息，例如 API 地址、密钥、常量等。这些配置信息可以集中管理，方便在应用程序中引用。</li>
+<li><strong>日志记录器</strong>：如果您需要记录应用程序的日志，可以创建一个日志记录器工具，用于记录和管理日志消息。</li>
+<li><strong>路由帮助函数</strong>：在使用路由库（如 Vue Router 或 React Router）时，可以创建一些帮助函数来处理路由导航、权限控制等。</li>
+<li><strong>格式化函数</strong>：用于格式化数据的函数，例如货币格式、日期时间格式、数字格式等。</li>
+<li><strong>通用组件</strong>：如果您的应用程序包含可在多个页面或组件中重复使用的通用组件，可以将这些组件放在 <code>utils</code> 文件夹中。</li>
+<li><strong>测试工具</strong>：用于单元测试或集成测试的工具函数和测试辅助函数。</li>
+</ol>
+<p>总之，<code>utils</code> 文件夹通常包含与项目相关的各种通用工具，这些工具可以帮助简化代码、提高开发效率并提供更好的代码组织和维护。但请确保按照项目的需求和规范来组织和命名这些工具函数和类。</p>
+<hr>
+<p><code>api</code> 文件夹通常用于存放与后端 API 通信相关的代码。这包括定义和管理 API 请求、处理响应以及与后端服务进行数据交互的功能</p>
+<hr>
+<p><code>&lt;router-view /&gt;</code> 是 Vue Router 的核心概念之一，它用于渲染匹配当前路由的组件内容。具体来说：</p>
+<ul>
+<li>当你的应用程序导航到不同的路由时，Vue Router 会根据路由规则确定要显示哪个组件。</li>
+<li><code>&lt;router-view /&gt;</code> 元素充当容器，用于呈现这些匹配的组件。</li>
+<li>你可以将 <code>&lt;router-view /&gt;</code> 放在你的应用程序布局中的任何地方，以确保匹配的组件被正确渲染。</li>
+</ul>
+<p>所以，这个代码片段表示你的组件模板中唯一的内容是一个用于呈现路由组件的 <code>&lt;router-view /&gt;</code> 元素。这是构建具有多个视图和页面的单页应用程序时常见的方式。</p>
+<hr>
+<p>URL 中的哈希值（hash）和传统的浏览器历史记录中的路径在使用方式和行为上有一些区别：</p>
+<ol>
+<li><strong>哈希值路径（例如 <code>#/home</code>）</strong>：<ul>
+<li>这种方式使用 URL 中的哈希部分（通常是 <code>#</code> 后面的内容）来表示路由路径。</li>
+<li>哈希路径的变化不会触发浏览器向服务器发送请求。这意味着，对于前端路由，页面的切换是在客户端完成的，不会导致页面的完全重新加载。</li>
+<li>哈希路径在单页应用程序（SPA）中常用，因为它不需要服务器端配置，且可以在前端路由中进行导航。</li>
+</ul>
+</li>
+<li><strong>传统路径（例如 <code>/home</code>）</strong>：<ul>
+<li>这种方式使用 URL 中的标准路径来表示路由路径，不涉及哈希部分。</li>
+<li>传统路径的变化通常会导致浏览器向服务器发送请求，服务器需要响应并提供相应的页面。这会导致页面完全重新加载。</li>
+<li>传统路径通常用于传统的多页应用程序，其中每个不同的路径对应于服务器上的不同页面。</li>
+</ul>
+</li>
+</ol>
+<p>在前端开发中，哈希路径通常更适用于单页应用程序（SPA），因为它们可以在不刷新整个页面的情况下进行页面切换，提供更好的用户体验。传统路径通常用于传统的多页应用程序或需要与服务器进行交互的情况。不过，也可以使用前端路由库（如 Vue Router）来实现传统路径的前端导航，而不需要完全重新加载页面。</p>
+<hr>
+<p>表单验证通常是通过 Vue 的 <code>v-model</code> 指令和 <code>ref</code> 来处理的</p>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;form ref=&quot;myForm&quot; @submit.prevent=&quot;submitForm&quot;&gt;</span><br><span class="line">    &lt;input v-model=&quot;formData.username&quot; placeholder=&quot;Username&quot; /&gt;</span><br><span class="line">    &lt;input v-model=&quot;formData.password&quot; type=&quot;password&quot; placeholder=&quot;Password&quot; /&gt;</span><br><span class="line">    &lt;button type=&quot;submit&quot;&gt;Submit&lt;/button&gt;</span><br><span class="line">  &lt;/form&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import &#123; ref &#125; from &#x27;vue&#x27;;</span><br><span class="line"></span><br><span class="line">export default &#123;</span><br><span class="line">  setup() &#123;</span><br><span class="line">    // 创建表单引用</span><br><span class="line">    const formRef = ref(null);</span><br><span class="line"></span><br><span class="line">    // 表单数据</span><br><span class="line">    const formData = &#123;</span><br><span class="line">      username: &#x27;&#x27;,</span><br><span class="line">      password: &#x27;&#x27;,</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    // 提交表单时的处理函数</span><br><span class="line">    const submitForm = () =&gt; &#123;</span><br><span class="line">      // 使用 formRef.value.validate 来触发表单验证</span><br><span class="line">      formRef.value.validate((valid) =&gt; &#123;</span><br><span class="line">        if (valid) &#123;</span><br><span class="line">          // 表单验证通过，可以执行提交操作</span><br><span class="line">          console.log(&#x27;Form is valid&#x27;);</span><br><span class="line">          // 这里可以执行提交表单的逻辑</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">          // 表单验证失败</span><br><span class="line">          console.log(&#x27;Form is invalid&#x27;);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    return &#123;</span><br><span class="line">      formRef,</span><br><span class="line">      formData,</span><br><span class="line">      submitForm,</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<hr>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">在 &lt;el-form-item&gt; 元素中配置 prop 属性的作用是将该表单项与表单数据对象中的字段关联起来，从而使表单项的值能够正确地绑定到数据对象的对应字段。</span><br><span class="line"></span><br><span class="line">具体来说，prop 属性的值应该与表单数据对象中的字段名一致，例如 prop=&quot;username&quot; 表示该表单项与表单数据对象中的 username 字段相关联。这样，当用户在表单项中输入数据时，Vue.js 就会自动将这些数据更新到 form.username 这个字段中。</span><br><span class="line"></span><br><span class="line">配置 prop 属性的好处包括：</span><br><span class="line"></span><br><span class="line">    数据绑定：可以确保表单项的值与数据对象中的字段保持同步，无需手动处理数据的收集和更新。</span><br><span class="line"></span><br><span class="line">    表单验证：如果使用了 Element UI 的表单验证功能，配置了 prop 属性后，会自动应用表单验证规则到关联的字段上，从而方便地进行表单验证。</span><br><span class="line"></span><br><span class="line">    表单提交：在提交表单时，可以直接使用数据对象，而不需要单独获取每个表单项的值。</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><code>v-slot</code> 是 Vue 3 中的新语法，用于定义具名插槽。</p>
+<p><code>#default</code> 是 Vue 2 中的语法，用于定义匿名插槽。</p>
+<p>在 Vue 2 中，你可以使用 <code>v-slot</code> 来定义具名插槽，但一般情况下，<code>#default</code> 用于匿名插槽，而具名插槽则使用 <code>v-slot:name</code></p>
+<hr>
+<p>Vue Router 是 Vue.js 官方的路由管理器</p>
+<p>带name</p>
+<p>“没有硬编码的 URL” 意味着你不需要在应用程序的各个地方手动编写 URL。而是使用路由的名称（name）来引用路由，使得在整个应用程序中，路由的 URL 都是自动生成和管理的。</p>
+<hr>
+<p>Vuex 是一个专为 Vue.js 应用程序开发的<strong>状态管理模式 + 库</strong>。它采用集中式存储管理应用的所有组件的状态，并以相应的规则保证状态以一种可预测的方式发生变化。</p>
+<p><strong>全局单例模式管理：</strong> 这是一种设计模式，通常用于在应用程序中维护全局状态。在 Vue.js 中，这可以通过  Vuex 来实现，它是一个专门用于状态管理的库。使用  Vuex，你可以将应用程序的共享状态抽取出来，以一个全局单例（单一的数据存储）的方式管理。这意味着无论在你的应用程序中的哪个组件，都可以访问和修改相同的状态，而不需要手动传递数据或处理事件。</p>
+<p>Vue.js 的默认组件通信方式（父组件传递给子组件或通过事件传递）变得不太适用，因为兄弟组件之间没有直接的父子关系。(vuex-store)</p>
+<p>每一个 Vuex 应用的核心就是 store（仓库）。“store”基本上就是一个容器，它包含着你的应用中大部分的**状态 (state)**。Vuex 和单纯的全局对象有以下两点不同：</p>
+<ol>
+<li>Vuex 的状态存储是响应式的。当 Vue 组件从 store 中读取状态的时候，若 store 中的状态发生变化，那么相应的组件也会相应地得到高效更新。</li>
+<li>你不能直接改变 store 中的状态。改变 store 中的状态的唯一途径就是显式地<strong>提交 (commit) mutation</strong>。这样使得我们可以方便地跟踪每一个状态的变化，从而让我们能够实现一些工具帮助我们更好地了解我们的应用。</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://vuex.vuejs.org/zh/guide/#%E6%9C%80%E7%AE%80%E5%8D%95%E7%9A%84-store">https://vuex.vuejs.org/zh/guide/#%E6%9C%80%E7%AE%80%E5%8D%95%E7%9A%84-store</a></p>
+<p>在 Vuex 中，所有的应用程序状态都存储在一个单一的 JavaScript 对象中，这个对象被称为“状态树”或“存储”（store）。这个状态树包含了整个应用程序的状态，无论应用中有多少组件或模块，它们都共享这个状态树。</p>
+<p>关键点如下：</p>
+<ol>
+<li><p><strong>单一数据源 (SSOT)：</strong> Vuex 鼓励将应用程序的所有状态集中管理，这意味着你不需要在不同的组件之间传递状态或维护多个分散的状态副本。这种集中式管理使得状态更加可维护和可预测。</p>
+</li>
+<li><p><strong>一个 store 实例：</strong> 在一个 Vue.js 应用中，通常只会创建一个 Vuex store 实例。这个实例在整个应用中起到全局状态管理的作用。无论你在哪个组件中需要访问状态，都可以通过这个 store 实例来获取或修改状态。</p>
+</li>
+<li><p><strong>模块化：</strong> 虽然整个应用共享一个状态树，但你可以使用 Vuex 的模块化系统来将状态树拆分为多个模块。这可以帮助你在大型应用中更好地组织状态，每个模块都有自己的状态、mutations、actions 等。</p>
+</li>
+<li><p><strong>数据响应式系统：</strong> Vue 使用响应式系统来追踪数据的变化。当数据发生变化时，Vue 会自动更新视图以反映这些变化。这个系统依赖于 JavaScript 的事件循环（Event Loop）机制。如果 <code>mutation</code> 是异步的，那么它可能无法在数据变化之前同步提交变化，从而导致视图和状态不一致。</p>
+</li>
+<li><p><strong>开发者工具：</strong> Vuex 提供了强大的开发者工具，可以追踪和调试状态的变化。如果 <code>mutation</code> 是异步的，这些工具将变得不可靠，因为它们无法准确地追踪异步操作的状态变化。</p>
+</li>
+</ol>
+<hr>
+<p>同步函数是一种在执行过程中不会阻塞或暂停程序执行的函数。当调用一个同步函数时，它会立即执行其中的代码，并在执行完毕后返回结果。同步函数通常用于处理那些不涉及异步操作（如网络请求、文件读写等）的任务。</p>
+<p>异步函数是一种可能会在执行过程中暂停程序，等待某些操作完成后再继续执行的函数</p>
+<hr>
+<p><code>timer &amp;&amp; clearTimeout(timer);</code>：这一行是在每次滚动事件触发时，首先清除之前设置的定时器，以确保在下一次滚动事件之前不会执行函数。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/undefined/vue3.2%E5%90%8E%E5%8F%B0%E7%AE%A1%E7%90%86%E5%BF%83%E5%BE%97/" data-id="clnubxg0d0000tgu23kyzdyoh" data-title="树的中/后序遍历（简易）" class="article-share-link">Share</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-vue项目创建过程" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/undefined/vue%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B/" class="article-date">
+  <time class="dt-published" datetime="2023-07-08T16:00:00.000Z" itemprop="datePublished">2023-07-09</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/undefined/vue%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B/">vue项目的创建过程</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>首先打开cmd，键入vue ui打开vue图形界面</p>
+<p>将建好的空白文件夹路径粘贴到更多-管理-创建</p>
+<p>手动配置，不保存预设</p>
+<p><strong>涉及到</strong>sass&#x2F;css&#x2F;eslink、linter&#x2F;vuex&#x2F;router、axios、husky、vue-vli</p>
+<p>app.vue好像是整体都有的</p>
+<p>“app.vue是vue页面资源的首加载项，是主组件，页面入口文件，所有页面都是在App.vue下进行切换的；也是整个项目的关键，app.vue负责构建定义及页面组件归集。</p>
+<p> <em>app.vue中不但可以当做是网站首页,也可以写所有页面中公共需要的动画或者样式</em>，</p>
+<p><em>所有的页面都是在app.vue中进行切换的</em></p>
+<p><em>ref 属性 ref 属性被用来给元素或子组件注册引用信息(id的替代者),相当于对页面元素或子组件标识</em></p>
+<p>import { Edit } from ‘@element-plus&#x2F;icons-vue’</p>
+ <script src="//unpkg.com/@element-plus/icons-vue"></script> 直接引用，组件首字母大小
+
+<h1 id="aria-hidden"><a href="#aria-hidden" class="headerlink" title="aria-hidden"></a>aria-hidden</h1><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_54334713/article/details/127344641">https://blog.csdn.net/qq_54334713/article/details/127344641</a></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">--legacy-peer-deps</span><br></pre></td></tr></table></figure>
+
+<p>npm run serve</p>
+<p>拖入prettierrc的配置文件</p>
+<p>在配置下.eslintrc.js里的rules 新增  为了解决eslint与prettier冲突<br>indent: 0,<br>‘space-before-function-paren’: 0</p>
+<p>git commit代码提交规范</p>
+<p>npm install -g <a href="mailto:&#x63;&#111;&#109;&#109;&#105;&#116;&#105;&#122;&#x65;&#x6e;&#64;&#52;&#x2e;&#50;&#46;&#x34;">&#x63;&#111;&#109;&#109;&#105;&#116;&#105;&#122;&#x65;&#x6e;&#64;&#52;&#x2e;&#50;&#46;&#x34;</a><br>npm i <a href="mailto:&#x63;&#x7a;&#45;&#x63;&#x75;&#115;&#x74;&#x6f;&#x6d;&#x69;&#x7a;&#97;&#98;&#108;&#x65;&#64;&#54;&#46;&#x33;&#46;&#48;">&#x63;&#x7a;&#45;&#x63;&#x75;&#115;&#x74;&#x6f;&#x6d;&#x69;&#x7a;&#97;&#98;&#108;&#x65;&#64;&#54;&#46;&#x33;&#46;&#48;</a> –save-dev</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;box&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">router-view</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">setup</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="keyword">const</span> boxWidth = <span class="string">&#x27;100px&#x27;</span></span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">lang</span>=<span class="string">&quot;scss&quot;</span>&gt;</span><span class="language-css"></span></span><br><span class="line"><span class="language-css"><span class="selector-class">.box</span> &#123;</span></span><br><span class="line"><span class="language-css"><span class="attribute">width</span>: <span class="built_in">v-bind</span>(boxWidth);</span></span><br><span class="line"><span class="language-css"><span class="attribute">height</span>: <span class="number">100px</span>;</span></span><br><span class="line"><span class="language-css"><span class="attribute">background-color</span>: red;</span></span><br><span class="line"><span class="language-css">&#125;</span></span><br><span class="line"><span class="language-css"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line">vue3.0 css绑定js</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/undefined/vue%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B/" data-id="clnubd3us000e64u27xut23xl" data-title="vue项目的创建过程" class="article-share-link">Share</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-joisc2014" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/undefined/joisc2014/" class="article-date">
@@ -113,7 +403,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/undefined/joisc2014/" data-id="clhbek2uh0001zgu23b1641rs" data-title="2882. 「JOISC 2014 Day4」两个人的星座" class="article-share-link">Share</a>
+      <a data-url="http://example.com/undefined/joisc2014/" data-id="clnubd3ul000964u26hfm1xs0" data-title="2882. 「JOISC 2014 Day4」两个人的星座" class="article-share-link">Share</a>
       
       
       
@@ -164,7 +454,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/undefined/hello-world/" data-id="clhbek2u30000zgu2e8rybh66" data-title="Hello World" class="article-share-link">Share</a>
+      <a data-url="http://example.com/undefined/hello-world/" data-id="clnubd3ui000564u261qoc6zb" data-title="Hello World" class="article-share-link">Share</a>
       
       
       
@@ -208,7 +498,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/undefined/linee/" data-id="clht6awn000086ou2df8sg0iv" data-title="linee" class="article-share-link">Share</a>
+      <a data-url="http://example.com/undefined/linee/" data-id="clnubd3ul000a64u2ablo53nu" data-title="linee" class="article-share-link">Share</a>
       
       
       
@@ -247,7 +537,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/undefined/lca/" data-id="clht6awmy00056ou2d97k2fbl" data-title="lca(最近公共祖先)" class="article-share-link">Share</a>
+      <a data-url="http://example.com/undefined/lca/" data-id="clnubd3uj000664u2245rb8al" data-title="lca(最近公共祖先)" class="article-share-link">Share</a>
       
       
       
@@ -286,7 +576,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/undefined/tree-min/" data-id="clht6awmy00066ou23wdwbho9" data-title="最小生成树" class="article-share-link">Share</a>
+      <a data-url="http://example.com/undefined/tree-min/" data-id="clnubd3uk000864u228hs5x9d" data-title="最小生成树" class="article-share-link">Share</a>
       
       
       
@@ -327,7 +617,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/undefined/treeArray/" data-id="clht6awn4000d6ou20gfj58jq" data-title="树状数组" class="article-share-link">Share</a>
+      <a data-url="http://example.com/undefined/treeArray/" data-id="clnubd3um000c64u299gva9qk" data-title="树状数组" class="article-share-link">Share</a>
       
       
       
@@ -373,7 +663,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/undefined/bag/" data-id="clht6awmw00036ou280mrdo4t" data-title="bag" class="article-share-link">Share</a>
+      <a data-url="http://example.com/undefined/bag/" data-id="clnubd3uh000364u23g9xb1gq" data-title="bag" class="article-share-link">Share</a>
       
       
       
@@ -415,121 +705,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/undefined/%E7%BA%BF%E6%AE%B5%E7%9B%B8%E4%BA%A4%E5%88%A4%E5%AE%9A/" data-id="clht6awna000m6ou2haoxcx0d" data-title="线段相交判定板子" class="article-share-link">Share</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-dij" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/undefined/dij/" class="article-date">
-  <time class="dt-published" datetime="2022-12-05T11:14:07.000Z" itemprop="datePublished">2022-12-05</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/undefined/dij/">最短路</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <p>##先总结吧 <a target="_blank" rel="noopener" href="https://oi-wiki.org/graph/shortest-path/">学习链接</a><br><strong>Floyd</strong></p>
-<blockquote>
-<p>任意两个结点之间的最短路</p>
-</blockquote>
-<p>我觉得像dp</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//自己到自己标为0或1， 没有通路为∞</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> k = <span class="number">1</span>; k &lt;= n; ++k)&#123;<span class="comment">//是否经过k的最短路</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; ++i)&#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">1</span>; j &lt;=n; ++j)&#123;</span><br><span class="line">                    map[i][j] = <span class="built_in">min</span>(map[i][j], map[i][k] + map[k][j]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<p>只允许经过规定结点</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//只允许经过3</span></span><br><span class="line">      <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; ++i)&#123;</span><br><span class="line">          <span class="keyword">for</span>(<span class="type">int</span> j = <span class="number">1</span>; j &lt;= n; ++j)&#123;</span><br><span class="line">              <span class="keyword">if</span>(map[i][j] &gt; map[i][<span class="number">3</span>] + map[<span class="number">3</span>][j])</span><br><span class="line">                  map[i][j] = map[i][<span class="number">3</span>] + map[<span class="number">3</span>][j];</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">//只允许经过3、4</span></span><br><span class="line">      <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; ++i)&#123;</span><br><span class="line">          <span class="keyword">for</span>(<span class="type">int</span> j = <span class="number">1</span>; j &lt;= n; ++j)&#123;</span><br><span class="line">              <span class="keyword">if</span>(map[i][j] &gt; map[i][<span class="number">3</span>] + map[<span class="number">3</span>][j])</span><br><span class="line">                  map[i][j] = map[i][<span class="number">3</span>] + map[<span class="number">3</span>][j];</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; ++i)&#123;</span><br><span class="line">          <span class="keyword">for</span>(<span class="type">int</span> j = <span class="number">1</span>; j &lt;= n; ++j)&#123;</span><br><span class="line">              <span class="keyword">if</span>(map[i][j] &gt; map[i][<span class="number">4</span>] + map[<span class="number">4</span>][j])</span><br><span class="line">                  map[i][j] = map[i][<span class="number">4</span>] + map[<span class="number">4</span>][j];</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br></pre></td></tr></table></figure>
-<p>点到点连通</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//1</span></span><br><span class="line">   <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; ++i)&#123;</span><br><span class="line">   	<span class="type">bool</span> flag = <span class="literal">true</span>;</span><br><span class="line">   	<span class="keyword">for</span>(<span class="type">int</span> j = <span class="number">1</span>; j &lt;= n; ++j)&#123;</span><br><span class="line">   		<span class="keyword">if</span>(!g[j][i])&#123;</span><br><span class="line">   			flag = <span class="literal">false</span>;</span><br><span class="line">   			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span>(flag) &#123;</span><br><span class="line">		cout &lt;&lt; i &lt;&lt; endl;</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//2 边权变为0/1</span></span><br><span class="line">std::bitset&lt;SIZE&gt; f[SIZE];</span><br><span class="line"><span class="keyword">for</span> (k = <span class="number">1</span>; k &lt;= n; k++)</span><br><span class="line">  <span class="keyword">for</span> (i = <span class="number">1</span>; i &lt;= n; i++)</span><br><span class="line">    <span class="keyword">if</span> (f[i][k]) f[i] = f[i] | f[k];</span><br></pre></td></tr></table></figure>
-<p><strong>johnson</strong><br>进阶版floyd<br><img src="https://img-blog.csdnimg.cn/bc535915fbf04b41845867ad759431ed.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6JuA54mZ54mZ5LmQ,size_20,color_FFFFFF,t_70,g_se,x_16" alt="在这里插入图片描述"></p>
-<p><strong>bellman-ford</strong></p>
-<blockquote>
-<p>含负权，单源最短路, 不能出现负权回路<br>   初始所有的点位∞，起点为0<br>   循环n次， 遍历m松弛操作（逐步接近，移动，取min）</p>
-</blockquote>
-<p>容易理解的版本</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">bf</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="type">int</span> n, m;</span><br><span class="line">    <span class="type">int</span> map[<span class="number">105</span>][<span class="number">105</span>];</span><br><span class="line">    <span class="type">int</span> s = <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> d[<span class="number">105</span>];</span><br><span class="line">    <span class="built_in">memset</span>(d, INF, <span class="built_in">sizeof</span>(d));</span><br><span class="line">    <span class="type">int</span> flag = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt;= n; ++i)&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">1</span>; j &lt;= n; ++j)&#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> k = <span class="number">1</span>; k &lt;= n; ++k)&#123;</span><br><span class="line">                <span class="keyword">if</span>(d[k] &gt; d[j] + map[j][k])&#123;</span><br><span class="line">                     d[k] = d[j] + map[j][k];</span><br><span class="line">                     flag = <span class="number">1</span>;</span><br><span class="line">                &#125; </span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(!flag)</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; ++i)&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">1</span>; j &lt;= m; ++j)&#123;</span><br><span class="line">            <span class="keyword">if</span>(d[j] &gt; d[i] + map[i][j])&#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;<span class="comment">//判断是否有负环</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这个代码更好</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//oi wiki</span></span><br><span class="line"><span class="comment">// C++ Version</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">edge</span> &#123;</span><br><span class="line">  <span class="type">int</span> v, w;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">vector&lt;edge&gt; e[maxn];</span><br><span class="line"><span class="type">int</span> dis[maxn];</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> inf = <span class="number">0x3f3f3f3f</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">bellmanford</span><span class="params">(<span class="type">int</span> n, <span class="type">int</span> s)</span> </span>&#123;</span><br><span class="line">  <span class="built_in">memset</span>(dis, <span class="number">63</span>, <span class="built_in">sizeof</span>(dis));</span><br><span class="line">  dis[s] = <span class="number">0</span>;</span><br><span class="line">  <span class="type">bool</span> flag;  <span class="comment">// 判断一轮循环过程中是否发生松弛操作</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">    flag = <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> u = <span class="number">1</span>; u &lt;= n; u++) &#123;</span><br><span class="line">      <span class="keyword">if</span> (dis[u] == inf) <span class="keyword">continue</span>;</span><br><span class="line">      <span class="comment">// 无穷大与常数加减仍然为无穷大</span></span><br><span class="line">      <span class="comment">// 因此最短路长度为 inf 的点引出的边不可能发生松弛操作</span></span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">auto</span> ed : e[u]) &#123;</span><br><span class="line">        <span class="type">int</span> v = ed.v, w = ed.w;</span><br><span class="line">        <span class="keyword">if</span> (dis[v] &gt; dis[u] + w) &#123;</span><br><span class="line">          dis[v] = dis[u] + w;</span><br><span class="line">          flag = <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 没有可以松弛的边时就停止算法</span></span><br><span class="line">    <span class="keyword">if</span> (!flag) <span class="keyword">break</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 第 n 轮循环仍然可以松弛时说明 s 点可以抵达一个负环</span></span><br><span class="line">  <span class="keyword">return</span> flag;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>spfa</strong>:反正被卡是基操就不写了，最坏时间复杂度和bf一样<br><strong>Dijkstra</strong><br>相当于bfs</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">dij</span><span class="params">(<span class="type">int</span> s)</span></span>&#123;</span><br><span class="line">    <span class="built_in">memset</span>(dis, <span class="number">0x3f</span>, <span class="built_in">sizeof</span>(dis));</span><br><span class="line">    <span class="built_in">memset</span>(vis, <span class="literal">false</span>, <span class="built_in">sizeof</span>(vis));</span><br><span class="line">    priority_queue &lt; pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt;, vector&lt;pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt;&gt;, greater&lt;pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt;&gt;&gt; q;<span class="comment">//也可以用struct代替</span></span><br><span class="line">    dis[s] = <span class="number">0</span>;</span><br><span class="line">    q.<span class="built_in">push</span>(&#123;dis[s], s&#125;);</span><br><span class="line">    <span class="keyword">while</span>(!q.<span class="built_in">empty</span>())&#123;</span><br><span class="line">        <span class="type">int</span> now = q.<span class="built_in">top</span>().second;</span><br><span class="line">        q.<span class="built_in">pop</span>();</span><br><span class="line">        <span class="keyword">if</span>(vis[now])</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        vis[now] = <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = head[now]; ~i; i = edge[i].next)&#123;</span><br><span class="line">            <span class="type">int</span> v = edge[i].to;</span><br><span class="line">            <span class="keyword">if</span>(!vis[v] &amp;&amp; edge[i].w + dis[now] &lt; dis[v])&#123;</span><br><span class="line">                dis[v] = edge[i].w + dis[now];</span><br><span class="line">                q.<span class="built_in">push</span>(&#123;dis[v], v&#125;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><img src="https://img-blog.csdnimg.cn/5548a7c24cb64f99b7bba4f17565e2fd.png" alt="在这里插入图片描述"></p>
-<p>##题荐</p>
-<h1 id="青蛙"><a href="#青蛙" class="headerlink" title="青蛙"></a><a target="_blank" rel="noopener" href="https://www.acwing.com/problem/content/4243/">青蛙</a></h1><p>思路：单源最短路，两两之间取max<br><img src="https://img-blog.csdnimg.cn/063f2f98838f4f77acd2f2719f3e9cbf.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6JuA54mZ54mZ5LmQ,size_20,color_FFFFFF,t_70,g_se,x_16" alt="在这里插入图片描述"></p>
-<p><strong>floyd</strong></p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//5552ms</span></span><br><span class="line">pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt; p[<span class="number">210</span>];</span><br><span class="line"><span class="type">double</span> dist[<span class="number">210</span>][<span class="number">210</span>];</span><br><span class="line"><span class="type">int</span> t;</span><br><span class="line"><span class="type">int</span> pre[<span class="number">210</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	IOS;</span><br><span class="line">	<span class="type">int</span> cnt = <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">while</span> (cin &gt;&gt; t &amp;&amp; t) &#123;</span><br><span class="line">		<span class="built_in">re</span>(p);</span><br><span class="line">		<span class="built_in">re</span>(dist);</span><br><span class="line">		<span class="built_in">re</span>(pre);</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= t; ++i)</span><br><span class="line">			cin &gt;&gt; p[i].first &gt;&gt; p[i].second;</span><br><span class="line">			<span class="comment">//求距离</span></span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= t - <span class="number">1</span>; ++i) &#123;<span class="comment">//这里注意范围，否则要错</span></span><br><span class="line">			<span class="keyword">for</span> (<span class="type">int</span> j = i + <span class="number">1</span>; j &lt;= t; ++j) &#123;</span><br><span class="line">				dist[i][j] = dist[j][i] = <span class="built_in">sqrt</span>((p[i].first - p[j].first) * (p[i].first - p[j].first) + (p[i].second - p[j].second) *</span><br><span class="line">				                               (p[i].second - p[j].second));</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//floyd</span></span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> k = <span class="number">1</span>; k &lt;= t; ++k) &#123;</span><br><span class="line">			<span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= t - <span class="number">1</span>; ++i) &#123;<span class="comment">//范围</span></span><br><span class="line">				<span class="keyword">for</span> (<span class="type">int</span> j = i + <span class="number">1</span>; j &lt;= t; ++j) &#123;</span><br><span class="line">					<span class="keyword">if</span> (dist[i][k] &lt; dist[i][j] &amp;&amp; dist[k][j] &lt; dist[i][j])</span><br><span class="line">						dist[i][j] = dist[j][i] = <span class="built_in">max</span>(dist[i][k], dist[k][j]);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;Scenario #%d\n&quot;</span>, cnt++);</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;Frog Distance = %.3f\n\n&quot;</span>, dist[<span class="number">1</span>][<span class="number">2</span>]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>dij</strong><br>太久没用优先队列都不会了orz<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_41687938/article/details/117827166">优先队列用法</a><br>最大的收获是：在while里面定义，记得初始化，最好用全int，最后再改值</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//1947ms</span></span><br><span class="line">pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt; p[<span class="number">210</span>];</span><br><span class="line"><span class="type">int</span> t;</span><br><span class="line"><span class="type">int</span> dis[<span class="number">210</span>];</span><br><span class="line"><span class="type">bool</span> vis[<span class="number">210</span>];</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">node</span>&#123;</span><br><span class="line">    <span class="type">int</span> j, dist;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	IOS;</span><br><span class="line">	<span class="type">int</span> cnt = <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">while</span> (cin &gt;&gt; t &amp;&amp; t) &#123;</span><br><span class="line">		<span class="built_in">re</span>(p);</span><br><span class="line">        <span class="built_in">remax</span>(dis);</span><br><span class="line">        <span class="built_in">re</span>(vis);</span><br><span class="line">        vector&lt;node&gt; a[<span class="number">210</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= t; ++i)</span><br><span class="line">			cin &gt;&gt; p[i].first &gt;&gt; p[i].second;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= t; ++i)&#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> j = i + <span class="number">1</span>; j &lt;= t; ++j)&#123;</span><br><span class="line">                <span class="keyword">if</span>(i != j)&#123;</span><br><span class="line">                    <span class="type">int</span> w = (p[i].first - p[j].first) * (p[i].first - p[j].first) + (p[i].second - p[j].second) *</span><br><span class="line">                                                                                        (p[i].second - p[j].second);</span><br><span class="line">                    a[i].<span class="built_in">push_back</span>(&#123;j, w&#125;);</span><br><span class="line">                    a[j].<span class="built_in">push_back</span>(&#123;i, w&#125;);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        priority_queue&lt;pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt;, vector&lt;pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt;&gt;, greater&lt;pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt;&gt;&gt; q;</span><br><span class="line">        q.<span class="built_in">push</span>(&#123;<span class="number">0</span>, <span class="number">1</span>&#125;);</span><br><span class="line">        dis[<span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span>(!q.<span class="built_in">empty</span>())&#123;</span><br><span class="line">            <span class="type">int</span> now = q.<span class="built_in">top</span>().second;</span><br><span class="line">            q.<span class="built_in">pop</span>();</span><br><span class="line">            <span class="keyword">if</span>(vis[now])</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            vis[now] = <span class="literal">true</span>;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">auto</span> w : a[now])&#123;</span><br><span class="line">                <span class="type">int</span> j = w.j;</span><br><span class="line">                <span class="keyword">if</span>(dis[j] &gt; <span class="built_in">max</span>(dis[now], w.dist))&#123;</span><br><span class="line">                    dis[j] = <span class="built_in">max</span>(dis[now], w.dist);</span><br><span class="line">                    q.<span class="built_in">push</span>(&#123;dis[j], j&#125;);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;Scenario #%d\n&quot;</span>, cnt++);</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;Frog Distance = %.3f\n\n&quot;</span>, <span class="built_in">sqrt</span>(dis[<span class="number">2</span>]));</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="货物运输"><a href="#货物运输" class="headerlink" title="货物运输"></a><a target="_blank" rel="noopener" href="https://www.acwing.com/problem/content/4244/">货物运输</a></h1><p>和上一道思路一模一样，怎么说呢，做了和没做好像没有什么区别，还给我整焦虑了</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">node</span>&#123;</span><br><span class="line">    <span class="type">int</span> v, w;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">bool</span> vis[<span class="number">1005</span>];</span><br><span class="line"><span class="type">int</span> dist[<span class="number">1005</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">dij</span><span class="params">(vector&lt;node&gt; v[])</span></span>&#123;</span><br><span class="line">    <span class="built_in">re</span>(vis);</span><br><span class="line">    <span class="built_in">re</span>(dist);</span><br><span class="line">    priority_queue&lt;pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt;&gt; q;</span><br><span class="line">    q.<span class="built_in">push</span>(&#123;<span class="number">2e9</span>,<span class="number">1</span>&#125;);</span><br><span class="line">    dist[<span class="number">1</span>] = <span class="number">2e9</span>;<span class="comment">//相当于要求的是最大的最长的路径，和上一题唯一不同点</span></span><br><span class="line">    <span class="keyword">while</span>(!q.<span class="built_in">empty</span>())&#123;</span><br><span class="line">        pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt; temp = q.<span class="built_in">top</span>();</span><br><span class="line">        q.<span class="built_in">pop</span>();</span><br><span class="line">        <span class="keyword">if</span>(vis[temp.second])</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        vis[temp.second] = <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">auto</span> w : v[temp.second])&#123;</span><br><span class="line">            <span class="type">int</span> v = w.v;</span><br><span class="line">            <span class="keyword">if</span>(dist[v] &lt; <span class="built_in">min</span>(dist[temp.second], w.w))&#123;</span><br><span class="line">                dist[v] = <span class="built_in">min</span>(dist[temp.second], w.w);</span><br><span class="line">                q.<span class="built_in">push</span>(&#123;dist[v], v&#125;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	IOS;</span><br><span class="line">	<span class="comment">// freopen(&quot;P1908_6.in&quot;,&quot;r&quot;,stdin);//读入数据</span></span><br><span class="line">	<span class="comment">// freopen(&quot;P1908.out&quot;,&quot;w&quot;,stdout); //输出数据</span></span><br><span class="line">    <span class="type">int</span> t;</span><br><span class="line">    cin &gt;&gt; t;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> c = <span class="number">1</span>; c &lt;= t; ++c)&#123;</span><br><span class="line">        <span class="type">int</span> n, m;</span><br><span class="line">        cin &gt;&gt; n &gt;&gt; m;</span><br><span class="line">        <span class="comment">//来建图</span></span><br><span class="line">        vector&lt;node&gt; v[<span class="number">1005</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= m; ++i)&#123;</span><br><span class="line">            <span class="type">int</span> a, b, c;</span><br><span class="line">            cin &gt;&gt; a &gt;&gt; b &gt;&gt; c;</span><br><span class="line">            v[a].<span class="built_in">push_back</span>(&#123;b, c&#125;);</span><br><span class="line">            v[b].<span class="built_in">push_back</span>(&#123;a, c&#125;);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">dij</span>(v);</span><br><span class="line">        </span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Scenario #%d:\n&quot;</span>,c);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%d\n\n&quot;</span>, dist[n]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>最小值中的最大值初始化: ans &#x3D; 0;<br>最大值中的最小值出初始化： ans  &#x3D; 0x3f3f3f;<br>然后ans逐渐缩小范围，得到最优解</p>
-</blockquote>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/undefined/dij/" data-id="clht6awmz00076ou27zffcw0u" data-title="最短路" class="article-share-link">Share</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-tree-round" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/undefined/tree-round/" class="article-date">
-  <time class="dt-published" datetime="2022-12-05T09:18:16.000Z" itemprop="datePublished">2022-12-05</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/undefined/tree-round/">树的中/后序遍历（简易）</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <p>全部都是先左子树，再右子树</p>
-<p><strong>中序: 先往左下走，无再向左的决策，输出该点回到上一点(父节点)再次判断。<br>后序:先往左下走，无可选择的决策，输出该点回到上一点判断</strong></p>
-<p>决策: 决定这一步向左子树走还是向右子树走。<br>          递归也是这样的道理</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/undefined/tree-round/" data-id="clht6awn100096ou2c08u9ifl" data-title="树的中/后序遍历（简易）" class="article-share-link">Share</a>
+      <a data-url="http://example.com/undefined/%E7%BA%BF%E6%AE%B5%E7%9B%B8%E4%BA%A4%E5%88%A4%E5%AE%9A/" data-id="clnubd3uw000p64u23h9feuny" data-title="线段相交判定板子" class="article-share-link">Share</a>
       
       
       
@@ -564,7 +740,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">May 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/03/">March 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/12/">December 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/01/">January 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/09/">September 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/07/">July 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">May 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/03/">March 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/12/">December 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/01/">January 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a></li></ul>
     </div>
   </div>
 
@@ -577,6 +753,14 @@
       <ul>
         
           <li>
+            <a href="/undefined/vue3.2%E5%90%8E%E5%8F%B0%E7%AE%A1%E7%90%86%E5%BF%83%E5%BE%97/">树的中/后序遍历（简易）</a>
+          </li>
+        
+          <li>
+            <a href="/undefined/vue%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B/">vue项目的创建过程</a>
+          </li>
+        
+          <li>
             <a href="/undefined/joisc2014/">2882. 「JOISC 2014 Day4」两个人的星座</a>
           </li>
         
@@ -586,14 +770,6 @@
         
           <li>
             <a href="/undefined/linee/">linee</a>
-          </li>
-        
-          <li>
-            <a href="/undefined/lca/">lca(最近公共祖先)</a>
-          </li>
-        
-          <li>
-            <a href="/undefined/tree-min/">最小生成树</a>
           </li>
         
       </ul>
