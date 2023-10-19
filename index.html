@@ -71,6 +71,89 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-pj1" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/undefined/pj1/" class="article-date">
+  <time class="dt-published" datetime="2023-10-19T12:42:55.000Z" itemprop="datePublished">2023-10-19</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/undefined/pj1/">项目面试1</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h3 id="基于vue2和nodejs的⾳乐系统"><a href="#基于vue2和nodejs的⾳乐系统" class="headerlink" title="基于vue2和nodejs的⾳乐系统"></a>基于vue2和nodejs的⾳乐系统</h3><h4 id="BFC"><a href="#BFC" class="headerlink" title="BFC"></a>BFC</h4><p>使用的fixed，块级格式上下文，规定内部区域元素不会影响到外部区域，最重要的是内部box垂直放置，浮动元素参与计算，垂直距离margin塌陷（clearfix），</p>
+<p><strong>如何创建BFC？</strong>(在某些情况下，特定的CSS属性值会使元素自动创建BFC)</p>
+<ul>
+<li>根元素，即HTML元素 (每当浏览器遇到一个HTML文档时，它会自动创建一个BFC，这个BFC包含了整个HTML文档的内容)</li>
+<li>float的值不为none</li>
+<li>position为absolute或fixed</li>
+<li>display的值为inline-block (指定对象为内联块元素)、table-cell (指定对象作为表格单元个,类似td)、table-caption (指定对象作为表格标题。类同于html标签caption)</li>
+<li>overflow的值不为visible</li>
+</ul>
+<p><strong>BFC的使用场景</strong></p>
+<ul>
+<li>去除边距重叠现象</li>
+<li>清除浮动（让父元素的高度包含子浮动元素）</li>
+<li>避免某元素被浮动元素覆盖</li>
+<li>避免多列布局由于宽度计算四舍五入而自动换行</li>
+</ul>
+<h4 id="session"><a href="#session" class="headerlink" title="session"></a>session</h4><p>express-session模块</p>
+<p>提一嘴使用v-if和v-show（css）</p>
+<h4 id="nextTick"><a href="#nextTick" class="headerlink" title="nextTick"></a>nextTick</h4><p>解决了异步渲染获取不到更新后DOM的问题了</p>
+<p>我也有简单了解<code>nextTick</code>实现，它会在<code>callbacks</code>里面加入我们传入的函数，然后用<code>timerFunc</code>异步方式调用它们，首选的异步方式会是<code>Promise</code>。这让我明白了为什么可以在<code>nextTick</code>中看到<code>dom</code>操作结果。</p>
+<h4 id="对数据竖着"><a href="#对数据竖着" class="headerlink" title="对数据竖着"></a>对数据竖着</h4><p>ceil取条数，slice进行分割</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;el-row :gutter=<span class="string">&quot;20&quot;</span> v-<span class="keyword">for</span>=<span class="string">&quot;(row, rowIndex) in Math.ceil(MusicList.length / 4)&quot;</span> :key=<span class="string">&quot;rowIndex&quot;</span>&gt;</span><br><span class="line">   <span class="language-xml"><span class="tag">&lt;<span class="name">el-col</span> <span class="attr">:span</span>=<span class="string">&quot;6&quot;</span> <span class="attr">v-for</span>=<span class="string">&quot;(item, colIndex) in MusicList.slice(rowIndex * 4, (rowIndex + 1) * 4)&quot;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">                                   <span class="attr">:key</span>=<span class="string">&quot;colIndex&quot;</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
+
+<p><strong>还有时间提一嘴如何进行监听去更新音乐播放器进度条</strong></p>
+<p>setTimeout，setinterval每个两秒重算</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">this</span>.<span class="property">audio</span>.<span class="title function_">addEventListener</span>(<span class="string">&#x27;timeupdate&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> duration = <span class="variable language_">this</span>.<span class="property">audio</span>.<span class="property">duration</span>;</span><br><span class="line">    <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> currentTime = <span class="variable language_">this</span>.<span class="property">audio</span>.<span class="property">currentTime</span></span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">current</span> = currentTime</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;当前播放时间:&#x27;</span>, currentTime)</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">percentage</span> = (currentTime / duration) * <span class="number">100</span></span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">percentage</span> = <span class="variable language_">this</span>.<span class="property">percentage</span>.<span class="title function_">toFixed</span>(<span class="number">0</span>)</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;播放进度百分比:&#x27;</span>, <span class="variable language_">this</span>.<span class="property">percentage</span>)</span><br><span class="line">    &#125;, <span class="number">1000</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="基于微信⼩程序的在线论坛"><a href="#基于微信⼩程序的在线论坛" class="headerlink" title="基于微信⼩程序的在线论坛"></a>基于微信⼩程序的在线论坛</h3><h4 id="节流"><a href="#节流" class="headerlink" title="节流"></a>节流</h4><p><code>节流</code>：（时间内）事件触发后，规定时间内，事件处理函数不能再次被调用。也就是说<u>在规定的时间内，函数只能被调用最先被触发的那次，直到这波过了</u>。所以适用于函数被<strong>频繁调用</strong>的场景。</p>
+<p><code>防抖</code>： 只有过了设定的时间&amp;&amp;没在设定时间内操作后，才会执行</p>
+<h4 id="全局"><a href="#全局" class="headerlink" title="全局"></a>全局</h4><p>说一下和vuex很像</p>
+<p>vuex:数据存储中心。Vuex其实就是一个状态管理工具，所谓的状态，就是数据，通过这个工具进行管理某些数据。当多个组件都需要同一个数据时，可以将这个数据交给Vuex进行统一的管理.</p>
+<ul>
+<li><p>state:vuex的基本数据，用来存储变量，存放的数据是响应式的。</p>
+</li>
+<li><p>mutations:提交更改数据，同步更新状态。</p>
+</li>
+<li><p>actions:提交mutations，可异步操作。</p>
+</li>
+<li><p>getters：是store的计算属性。</p>
+</li>
+<li><p>modules:模块，每个模块里面有四个属性。</p>
+</li>
+</ul>
+<h4 id="async-x2F-await"><a href="#async-x2F-await" class="headerlink" title="async&#x2F;await"></a>async&#x2F;await</h4><p>async 函数返回一个 Promise 对象，当函数执行的时候，一旦遇到 await 就会先返回，等到触发的异步操作完成，再执行函数体内后面的语句。可以理解为，是让出了线程，跳出了 async 函数体。</p>
+<p><strong>自执行</strong>的generate函数。利用generate函数的特性把异步的代码写成“同步”的形式,第一个请求的返回值作为后面一个请求的参数,其中每一个参数都是一个promise对象.</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/undefined/pj1/" data-id="clnx755oc0000rgu25nf390t6" data-title="项目面试1" class="article-share-link">Share</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-vue3.2后台管理心得" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/undefined/vue3.2%E5%90%8E%E5%8F%B0%E7%AE%A1%E7%90%86%E5%BF%83%E5%BE%97/" class="article-date">
@@ -675,48 +758,6 @@
 
 
   
-    <article id="post-线段相交判定" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/undefined/%E7%BA%BF%E6%AE%B5%E7%9B%B8%E4%BA%A4%E5%88%A4%E5%AE%9A/" class="article-date">
-  <time class="dt-published" datetime="2023-03-02T09:07:14.000Z" itemprop="datePublished">2023-03-02</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/undefined/%E7%BA%BF%E6%AE%B5%E7%9B%B8%E4%BA%A4%E5%88%A4%E5%AE%9A/">线段相交判定板子</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h3 id="线段是否相交"><a href="#线段是否相交" class="headerlink" title="线段是否相交"></a>线段是否相交</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="comment">// template&lt;class T&gt; double chaji(T c, T d, T a)&#123;</span></span><br><span class="line"><span class="comment">//    // return (p3.x - p1.x) * (p3.y - p2.y) - (p3.x - p2.x) * (p3.y - p1.y);</span></span><br><span class="line"><span class="comment">//    return (a.first - c.first) * (d.second - c.second) - (d.first - c.first) * (a.second - c.second);</span></span><br><span class="line"><span class="comment">// &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt; <span class="type">bool</span> <span class="title">judge2</span><span class="params">(T a,  T b, T c, T d)</span></span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">max</span>(a.first , b.first) &gt;= <span class="built_in">min</span>(c.first, d.first) &amp;&amp; <span class="built_in">max</span>(c.first, d.first) &gt;= <span class="built_in">min</span>(a.first, b.first) &amp;&amp; <span class="built_in">max</span>(a.second, b.second) &gt;= <span class="built_in">min</span>(c.second, d.second) &amp;&amp; <span class="built_in">max</span>(c.second, d.second) &gt;= <span class="built_in">min</span>(a.second, b.second))</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt; <span class="type">bool</span> <span class="title">judge1</span><span class="params">(T a,  T b, T c, T d)</span></span>&#123;<span class="comment">//跨立实验</span></span><br><span class="line">    <span class="keyword">if</span>(!<span class="built_in">judge2</span>(a, b, c, d))</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    <span class="type">double</span> d1 = (a.first - c.first) * (d.second - c.second) - (d.first - c.first) * (a.second - c.second);</span><br><span class="line">    <span class="type">double</span> d2 = (d.first - c.first) * (b.second - c.second) - (b.first - c.first) * (d.second - c.second);</span><br><span class="line">    <span class="type">double</span> d3 = (c.first - a.first) * (b.second - a.second) - (b.first - a.first) * (c.second - a.second);</span><br><span class="line">    <span class="type">double</span> d4 = (b.first - a.first) * (d.second - a.second) - (d.first - a.first) * (b.second - a.second);</span><br><span class="line">   <span class="keyword">if</span>(d3 * d4 &gt;= <span class="number">0</span> &amp;&amp; d1 * d2 &gt;= <span class="number">0</span>)</span><br><span class="line">           <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//一般做题是先快速排斥， 后跨立</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="type">int</span> t;</span><br><span class="line">    cin &gt;&gt; t;</span><br><span class="line">    <span class="keyword">while</span>(t--)&#123;</span><br><span class="line">        pair&lt;<span class="type">double</span>, <span class="type">double</span>&gt; p[<span class="number">4</span>];</span><br><span class="line">            cin &gt;&gt; p[<span class="number">0</span>].first &gt;&gt; p[<span class="number">0</span>].second &gt;&gt; p[<span class="number">1</span>].first &gt;&gt; p[<span class="number">1</span>].second &gt;&gt; p[<span class="number">2</span>].first &gt;&gt; p[<span class="number">2</span>].second &gt;&gt; p[<span class="number">3</span>].first &gt;&gt; p[<span class="number">3</span>].second;</span><br><span class="line">            <span class="keyword">if</span> (<span class="built_in">judge1</span>(p[<span class="number">0</span>], p[<span class="number">1</span>], p[<span class="number">2</span>], p[<span class="number">3</span>]))</span><br><span class="line">                cout &lt;&lt; <span class="string">&quot;Yes&quot;</span> &lt;&lt; endl;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                cout &lt;&lt; <span class="string">&quot;No&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">   </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="线段相交是否规范（只能过90-数据，先占个位）"><a href="#线段相交是否规范（只能过90-数据，先占个位）" class="headerlink" title="线段相交是否规范（只能过90%数据，先占个位）"></a>线段相交是否规范（只能过90%数据，先占个位）</h3><img src="C:\Users\86188\AppData\Roaming\Typora\typora-user-images\image-20230302214527151.png" alt="image-20230302214527151" style="zoom:80%;" />
-
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//#include&lt;bits/stdc++.h&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cstdio&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cstring&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;set&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;map&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;cmath&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stack&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;queue&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;climits&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IOS ios::sync_with_stdio(false),cin.tie(NULL),cout.tie(NULL);</span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> maxx = <span class="number">1e4</span> + <span class="number">5</span>;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> maxn = <span class="number">1e6</span> + <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> N 10000100</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ll long long</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> endl <span class="string">&#x27;\n&#x27;</span></span></span><br><span class="line"><span class="type">const</span> ll  mod = <span class="number">998244353</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> test printf(<span class="string">&quot;--------------------------\n&quot;</span>);</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> re(a) memset((a), 0, sizeof((a)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> remax(a) memset((a), 0x3f3f3f3f, sizeof((a)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PII pair<span class="string">&lt;int, int&gt;</span></span></span><br><span class="line"><span class="type">const</span> <span class="type">double</span> pi=<span class="built_in">acos</span>(<span class="number">-1.0</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="type">int</span> <span class="title">llog</span><span class="params">(<span class="type">int</span> n)</span></span>&#123; <span class="keyword">return</span> <span class="number">31</span> - __builtin_clz(n);&#125; <span class="comment">//取对数</span></span><br><span class="line"><span class="comment">// struct cmp&#123;</span></span><br><span class="line"><span class="comment">//     friend bool operator &gt; (const struct scoree &amp;a, const struct scoree &amp;b)&#123;</span></span><br><span class="line"><span class="comment">//         return a.score &gt; b.score;</span></span><br><span class="line"><span class="comment">//     &#125;</span></span><br><span class="line"><span class="comment">// &#125;;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt; <span class="type">bool</span> <span class="title">judge2</span><span class="params">(T a,  T b, T c, T d)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">max</span>(a.first , b.first) &gt;= <span class="built_in">min</span>(c.first, d.first) &amp;&amp; <span class="built_in">max</span>(c.first, d.first) &gt;= <span class="built_in">min</span>(a.first, b.first) &amp;&amp; <span class="built_in">max</span>(a.second, b.second) &gt;= <span class="built_in">min</span>(c.second, d.second) &amp;&amp; <span class="built_in">max</span>(c.second, d.second) &gt;= <span class="built_in">min</span>(a.second, b.second))</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt; <span class="type">bool</span> <span class="title">judge1</span><span class="params">(T a,  T b, T c, T d)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(!<span class="built_in">judge2</span>(a, b, c, d))&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">double</span> d1 = (a.first - c.first) * (d.second - c.second) - (d.first - c.first) * (a.second - c.second);</span><br><span class="line">    <span class="type">double</span> d2 = (d.first - c.first) * (b.second - c.second) - (b.first - c.first) * (d.second - c.second);</span><br><span class="line">    <span class="type">double</span> d3 = (c.first - a.first) * (b.second - a.second) - (b.first - a.first) * (c.second - a.second);</span><br><span class="line">    <span class="type">double</span> d4 = (b.first - a.first) * (d.second - a.second) - (d.first - a.first) * (b.second - a.second);</span><br><span class="line">   <span class="keyword">if</span>(d3 * d4 &gt;= <span class="number">0</span> &amp;&amp; d1 * d2 &gt;= <span class="number">0</span>)&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">   &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">judge3</span><span class="params">(PII a,  PII b, PII c, PII d)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>((b.first - a.first) * (c.first - d.first) + (b.second - a.second) * (d.second - c.second) == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="type">int</span> t;</span><br><span class="line">    cin &gt;&gt; t;</span><br><span class="line">    <span class="keyword">while</span>(t--)&#123;</span><br><span class="line">        pair&lt;<span class="type">double</span>, <span class="type">double</span>&gt; p[<span class="number">4</span>];</span><br><span class="line">            cin &gt;&gt; p[<span class="number">0</span>].first &gt;&gt; p[<span class="number">0</span>].second &gt;&gt; p[<span class="number">1</span>].first &gt;&gt; p[<span class="number">1</span>].second &gt;&gt; p[<span class="number">2</span>].first &gt;&gt; p[<span class="number">2</span>].second &gt;&gt; p[<span class="number">3</span>].first &gt;&gt; p[<span class="number">3</span>].second;</span><br><span class="line">            <span class="keyword">if</span>(<span class="built_in">judge1</span>(p[<span class="number">0</span>], p[<span class="number">1</span>], p[<span class="number">2</span>], p[<span class="number">3</span>]))&#123;</span><br><span class="line">                <span class="keyword">if</span>(<span class="built_in">judge3</span>(p[<span class="number">0</span>], p[<span class="number">1</span>], p[<span class="number">2</span>], p[<span class="number">3</span>]))</span><br><span class="line">                    cout &lt;&lt; <span class="number">1</span> &lt;&lt; endl;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    cout &lt;&lt; <span class="number">2</span> &lt;&lt; endl;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                cout &lt;&lt; <span class="number">0</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">   </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/undefined/%E7%BA%BF%E6%AE%B5%E7%9B%B8%E4%BA%A4%E5%88%A4%E5%AE%9A/" data-id="clnubd3uw000p64u23h9feuny" data-title="线段相交判定板子" class="article-share-link">Share</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
 
 
   <nav id="page-nav">
@@ -740,7 +781,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/09/">September 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/07/">July 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">May 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/03/">March 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/12/">December 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/01/">January 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/10/">October 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/09/">September 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/07/">July 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">May 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/03/">March 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/12/">December 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/01/">January 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a></li></ul>
     </div>
   </div>
 
@@ -751,6 +792,10 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/undefined/pj1/">项目面试1</a>
+          </li>
         
           <li>
             <a href="/undefined/vue3.2%E5%90%8E%E5%8F%B0%E7%AE%A1%E7%90%86%E5%BF%83%E5%BE%97/">树的中/后序遍历（简易）</a>
@@ -766,10 +811,6 @@
         
           <li>
             <a href="/undefined/hello-world/">Hello World</a>
-          </li>
-        
-          <li>
-            <a href="/undefined/linee/">linee</a>
           </li>
         
       </ul>
