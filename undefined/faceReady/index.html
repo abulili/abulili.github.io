@@ -4,17 +4,17 @@
   <meta charset="utf-8">
   
   
-  <title>对拍 | nu∞-记录</title>
+  <title>面试准备 | nu∞-记录</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="STL关于50条总结（effective stl） 标准STL序列容器： vector、string、deque、list 标准STL关联容器（会按照某种排序规则插入）： set、mulitiset、map、multimap 非标准STL序列容器： slist、rope 非标准的关联容器hash_set、hase_multiset、hash_map和hash_multimap 几种标准的非STL容">
+  <meta name="description" content="第一次面试，应该不太可能找到工作。先准备好，看看有哪些欠缺吧。 记得录音，好复盘自我介绍，语速放慢点 &lt;&#x3D;2min 先破冰：你好，请问怎么称呼您呢？ x老师非常高兴你今天来面试我 （不用破冰也行，） 再进行自我介绍，拆段说项目、生活 与这个岗位适配理由，例如专业能力（毕竟面试官也需要向上汇报）  你好，很高兴今天你来面试我。我叫xx，是明年毕业计科专业，我想应聘公司的xxxx，一直">
 <meta property="og:type" content="article">
-<meta property="og:title" content="对拍">
-<meta property="og:url" content="http://example.com/undefined/STL%E5%85%B3%E4%BA%8E50%E6%9D%A1%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:title" content="面试准备">
+<meta property="og:url" content="http://example.com/undefined/faceReady/index.html">
 <meta property="og:site_name" content="nu∞-记录">
-<meta property="og:description" content="STL关于50条总结（effective stl） 标准STL序列容器： vector、string、deque、list 标准STL关联容器（会按照某种排序规则插入）： set、mulitiset、map、multimap 非标准STL序列容器： slist、rope 非标准的关联容器hash_set、hase_multiset、hash_map和hash_multimap 几种标准的非STL容">
+<meta property="og:description" content="第一次面试，应该不太可能找到工作。先准备好，看看有哪些欠缺吧。 记得录音，好复盘自我介绍，语速放慢点 &lt;&#x3D;2min 先破冰：你好，请问怎么称呼您呢？ x老师非常高兴你今天来面试我 （不用破冰也行，） 再进行自我介绍，拆段说项目、生活 与这个岗位适配理由，例如专业能力（毕竟面试官也需要向上汇报）  你好，很高兴今天你来面试我。我叫xx，是明年毕业计科专业，我想应聘公司的xxxx，一直">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2021-05-08T16:00:00.000Z">
-<meta property="article:modified_time" content="2023-10-19T13:13:40.582Z">
+<meta property="article:published_time" content="2023-10-17T13:07:36.000Z">
+<meta property="article:modified_time" content="2023-10-19T13:11:33.370Z">
 <meta property="article:author" content="桉念">
 <meta name="twitter:card" content="summary">
   
@@ -73,10 +73,10 @@
 </header>
 
       <div class="outer">
-        <section id="main"><article id="post-STL关于50条总结" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+        <section id="main"><article id="post-faceReady" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
-    <a href="/undefined/STL%E5%85%B3%E4%BA%8E50%E6%9D%A1%E6%80%BB%E7%BB%93/" class="article-date">
-  <time class="dt-published" datetime="2021-05-08T16:00:00.000Z" itemprop="datePublished">2021-05-09</time>
+    <a href="/undefined/faceReady/" class="article-date">
+  <time class="dt-published" datetime="2023-10-17T13:07:36.000Z" itemprop="datePublished">2023-10-17</time>
 </a>
     
   </div>
@@ -87,7 +87,7 @@
         
   
     <h1 class="p-name article-title" itemprop="headline name">
-      对拍
+      面试准备
     </h1>
   
 
@@ -95,36 +95,30 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <h2 id="STL关于50条总结（effective-stl）"><a href="#STL关于50条总结（effective-stl）" class="headerlink" title="STL关于50条总结（effective stl）"></a>STL关于50条总结（effective stl）</h2><ul>
-<li>标准STL序列容器： vector、string、deque、list</li>
-<li>标准STL关联容器（会按照某种排序规则插入）： set、mulitiset、map、multimap</li>
-<li>非标准STL序列容器： slist、rope</li>
-<li>非标准的关联容器hash_set、hase_multiset、hash_map和hash_multimap</li>
-<li>几种标准的非STL容器，数组、bitset、valarray、stack、queue和priority_queue</li>
-</ul>
-<p>序列容器支持push_front <strong>&#x2F;</strong> push_back</p>
-<p>关联容器提供了<strong>对数时间</strong>的lower_bound、ipper_bound、equal_range</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">连续内存容器：标准： vector、string、deque</span><br><span class="line">​							非标准：rope</span><br><span class="line"></span><br><span class="line">基于节点的容器：容器内元素的插入删除只影响指向节点的指针（提供了双向迭代器）</span><br><span class="line">​							 list、slist</span><br><span class="line"></span><br><span class="line">标准C++部分： 排除slist、rope</span><br><span class="line">对插入删除失败的回滚能力： 基于节点的容器</span><br><span class="line">deque的插入操作仅在末尾时，迭代器可能会失效，但指针和引用不会失效（特殊的）</span><br></pre></td></tr></table></figure>
-
-<p>任意位置插入： 序列容器</p>
-<p><strong>元素查找速度</strong>： 哈希 &gt; 排序的vector &gt; 标准关联容器</p>
-<p>随机访问迭代器： vector、string、deque</p>
-<p>​							要求这个的： sort类的函数、nth_element</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">string是STL中在swap过程中会导致迭代器、指针和引用变为无效的唯一容器。</span><br><span class="line">STL容器是各自有优缺点的，不能混在一起用。</span><br><span class="line">	有时候可能会改容器，这时候使用封装P14（暂时不想看懂）</span><br><span class="line">拷贝对象是STL的工作方式</span><br><span class="line">通过利用插入迭代器的方式来限定目标区间的copy调用，几乎全部应替换为对区间成员函数的调用</span><br></pre></td></tr></table></figure>
-
-<p>map&lt;string, vector&lt;类&gt;&gt;<strong>遍历</strong>： map&lt;string, vector&lt;类&gt; : : iterator&gt; : : const_iterator</p>
-<p>if(c.size() &#x3D;&#x3D; 0)	<strong>&lt;&#x3D;&gt;</strong>	if(c.empty()) (这个更优,对所有容器都为常数操作)</p>
-<p>两个vector 	使v1的内容和v2的后半部分相同的最简单操作：</p>
-<p><code>																	v1.assign(v2.begin() + v2.size() / 2, v2.end());</code> (copy也影响效率，不行)</p>
-<p>对区间函数调用： <code>v1.insert(v1.end(), v2.begin(), + v2.size() / 2, v2.end());</code></p>
-<p>​						（数组插到vector也可用）</p>
-<p>​	assign： 需要完全替换一个标准序列容器内容时</p>
-<p>​	operator &#x3D; : 可选择的赋值函数 <strong>？</strong></p>
+        <p>第一次面试，应该不太可能找到工作。先准备好，看看有哪些欠缺吧。</p>
+<h4 id="记得录音，好复盘"><a href="#记得录音，好复盘" class="headerlink" title="记得录音，好复盘"></a>记得录音，好复盘</h4><h4 id="自我介绍，语速放慢点-lt-x3D-2min"><a href="#自我介绍，语速放慢点-lt-x3D-2min" class="headerlink" title="自我介绍，语速放慢点 &lt;&#x3D;2min"></a>自我介绍，语速放慢点 &lt;&#x3D;2min</h4><blockquote>
+<p>先破冰：你好，请问怎么称呼您呢？ x老师非常高兴你今天来面试我</p>
+<p>（不用破冰也行，）</p>
+<p>再进行自我介绍，拆段说项目、生活</p>
+<p>与这个岗位适配理由，例如专业能力（毕竟面试官也需要向上汇报）</p>
+</blockquote>
+<p>你好，很高兴今天你来面试我。我叫xx，是明年毕业计科专业，我想应聘公司的xxxx，一直对这个专业很感兴趣，我相信前端在未来几年内还是不可替代的。在校期间成绩还不错，同时参加了一些相关竞赛，做了一些项目。获得并学习到了xx。我也是一个很喜欢进行探索学习，喜欢新事物的人，希望可以在这方面进行发展，有机会进入贵公司工作。</p>
+<p>我做的项目巴拉巴拉巴拉，怎么做的，有什么难点，才好提问</p>
+<p>其它问题：</p>
+<h4 id="为什么选择我们公司"><a href="#为什么选择我们公司" class="headerlink" title="为什么选择我们公司"></a>为什么选择我们公司</h4><p>首先是我个人的职业发展规划，我觉得自己认真的性格加上专业，很适合这个岗位，也希望能在xx岗位长期发展。我举得贵公司可以让我发挥自己的优势，得到成长。</p>
+<h4 id="职业发展规划："><a href="#职业发展规划：" class="headerlink" title="职业发展规划："></a>职业发展规划：</h4><p>分阶段，快速熟悉，接触核心业务，独立带项目</p>
+<h4 id="你认为你最大的优点是什么？"><a href="#你认为你最大的优点是什么？" class="headerlink" title="你认为你最大的优点是什么？"></a>你认为你最大的优点是什么？</h4><p>执行能力强，学习探索能力较强，不懂的问题能主动通过自己的方式解决，解决问题念能力强。比如竞赛经历使我对调bug很擅长</p>
+<h4 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h4><p>在有人解决问题时看见错误会怀疑自己有问题，不敢提。-会委婉说有没有可能&#x2F; 公开演讲能力欠缺。</p>
+<p>作为应届生，在工具使用趋势方面缺乏经验，关注一些博主，保持信息获取</p>
+<h4 id="加班"><a href="#加班" class="headerlink" title="加班"></a>加班</h4><p>作为新人刚进新岗位加班很正常，为跟上工作节奏，我也会在初期投入时间学习，尽快熟悉业务。其此，随着工作的熟练，我会替身自己的工作效率，减少无效加班，请问公司的加班情况什么样？</p>
+<h4 id="期望薪资"><a href="#期望薪资" class="headerlink" title="期望薪资"></a>期望薪资</h4><p>4500</p>
+<h4 id="有什么问的"><a href="#有什么问的" class="headerlink" title="有什么问的"></a>有什么问的</h4><p>工作内容，转正，</p>
+<p>第一次面试还挺紧张，谢谢你的时间，我们聊完之后，1-10分对我感兴趣的程度是几分，为什么是这个分数呢能告诉我吗</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/undefined/STL%E5%85%B3%E4%BA%8E50%E6%9D%A1%E6%80%BB%E7%BB%93/" data-id="clnx7gbvk0001m4u224ludyj7" data-title="对拍" class="article-share-link">Share</a>
+      <a data-url="http://example.com/undefined/faceReady/" data-id="clnx7gbvo0006m4u207qxa0al" data-title="面试准备" class="article-share-link">Share</a>
       
       
       
@@ -134,19 +128,19 @@
     
 <nav id="article-nav">
   
-    <a href="/undefined/STL%E6%80%BB%E7%BB%93/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/undefined/pj1/" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
-          对拍
+          项目面试1
         
       </div>
     </a>
   
   
-    <a href="/undefined/DFS/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/undefined/vue3.2%E5%90%8E%E5%8F%B0%E7%AE%A1%E7%90%86%E5%BF%83%E5%BE%97/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">dfs</div>
+      <div class="article-nav-title">vue3后台管理系统</div>
     </a>
   
 </nav>
