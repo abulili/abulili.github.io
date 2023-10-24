@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>最短路（路径规划） | nu∞-记录</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="找到实习了，想起面试的时候问了一嘴会不会路径规划和DP，这两天复习一下。打个标记，这公司还要前端还要3D oi-wiki定义 做的题在 知乎-如何加快城市路网中最短路径查询效率？ 快速总结 Floyd任意两点最短路，时间O(n3), 空间O(n2) Bellman–Ford最短路，可判负环，时间O(nm),空间O(m) SPFA卡常，但是最坏时间是O(nm),开发中稀疏图应该能用（存疑） Dijk">
+<meta property="og:type" content="article">
+<meta property="og:title" content="最短路（路径规划）">
+<meta property="og:url" content="http://example.com/undefined/road/index.html">
+<meta property="og:site_name" content="nu∞-记录">
+<meta property="og:description" content="找到实习了，想起面试的时候问了一嘴会不会路径规划和DP，这两天复习一下。打个标记，这公司还要前端还要3D oi-wiki定义 做的题在 知乎-如何加快城市路网中最短路径查询效率？ 快速总结 Floyd任意两点最短路，时间O(n3), 空间O(n2) Bellman–Ford最短路，可判负环，时间O(nm),空间O(m) SPFA卡常，但是最坏时间是O(nm),开发中稀疏图应该能用（存疑） Dijk">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://pic3.zhimg.com/v2-6c1205975ee24c377b0f0c131112d5ca_r.jpg">
+<meta property="article:published_time" content="2023-10-24T07:08:54.000Z">
+<meta property="article:modified_time" content="2023-10-24T09:38:27.565Z">
+<meta property="article:author" content="桉念">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pic3.zhimg.com/v2-6c1205975ee24c377b0f0c131112d5ca_r.jpg">
+  
+    <link rel="alternate" href="/atom.xml" title="nu∞-记录" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">nu∞-记录</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-road" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/undefined/road/" class="article-date">
+  <time class="dt-published" datetime="2023-10-24T07:08:54.000Z" itemprop="datePublished">2023-10-24</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      最短路（路径规划）
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>找到实习了，想起面试的时候问了一嘴会不会路径规划和DP，这两天复习一下。打个标记，这公司还要前端还要3D</p>
+<p><a target="_blank" rel="noopener" href="https://oi-wiki.org/graph/shortest-path/">oi-wiki定义</a></p>
+<p><a target="_blank" rel="noopener" href="https://abulili.github.io/undefined/dij/">做的题在</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/368061515">知乎-如何加快城市路网中最短路径查询效率？</a></p>
+<h4 id="快速总结"><a href="#快速总结" class="headerlink" title="快速总结"></a>快速总结</h4><ul>
+<li>Floyd任意两点最短路，时间O(n3), 空间O(n2)</li>
+<li>Bellman–Ford最短路，可判负环，时间O(nm),空间O(m)</li>
+<li>SPFA卡常，但是最坏时间是O(nm),开发中稀疏图应该能用（存疑）</li>
+<li>Dijkstra非负最短路，开发用这个才最合适吧</li>
+<li>Johnson任意两点最短路,类似Floyd，时间O(NMlogM)</li>
+<li>其它：A*（a到b所有路径中第k短）等</li>
+<li><img src="https://pic3.zhimg.com/v2-6c1205975ee24c377b0f0c131112d5ca_r.jpg"></li>
+</ul>
+<h4 id="Dij拓展"><a href="#Dij拓展" class="headerlink" title="Dij拓展"></a>Dij拓展</h4><p>基本都用的优先队列，没深挖，在当时已经够用了</p>
+<blockquote>
+<p>n为边，m为顶点</p>
+</blockquote>
+<h5 id="暴力："><a href="#暴力：" class="headerlink" title="暴力："></a>暴力：</h5><p>时间复杂度O(n2)</p>
+<h5 id="二叉堆："><a href="#二叉堆：" class="headerlink" title="二叉堆："></a>二叉堆：</h5><p>插入修改时间复杂度O(logn),总时间复杂度O(mlogn)</p>
+<h5 id="优先队列："><a href="#优先队列：" class="headerlink" title="优先队列："></a>优先队列：</h5><p>时间复杂度O(mlogm)</p>
+<h5 id="Fibonacci-堆："><a href="#Fibonacci-堆：" class="headerlink" title="Fibonacci 堆："></a>Fibonacci 堆：</h5><p>插入O(1),时间复杂度O(nlogn+m)，时间复杂度最优</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/SBS2000/article/details/52757004">参考1</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/swu-luo/p/3751861.html">参考2</a></p>
+<p>相对于优先队列，只是改变了抽最小节点出来的方式</p>
+<p><em>…这代码也太长了</em></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">之后再补充</span><br></pre></td></tr></table></figure>
+
+<h5 id="线段树："><a href="#线段树：" class="headerlink" title="线段树："></a>线段树：</h5><p>类似二叉堆原理，时间复杂度O(mlogn)</p>
+<h4 id="Johnson补充"><a href="#Johnson补充" class="headerlink" title="Johnson补充"></a>Johnson补充</h4><ol>
+<li>虚拟节点0向其它所有点边权为0，bf找出0到其他店的最短路（hi）</li>
+<li>重设边的边权w+hu-hv</li>
+<li>跑dij</li>
+</ol>
+<h4 id="A"><a href="#A" class="headerlink" title="A*"></a>A*</h4><p><a target="_blank" rel="noopener" href="https://oi-wiki.org/graph/kth-path/">k短路-A*</a></p>
+<p>最坏O(nklogn)</p>
+<p>f(x) &#x3D; g(x) + h(x)</p>
+<p><strong>a-&gt;b的第k小</strong></p>
+<ol>
+<li>g(x)为初始点a到当前的x点的距离；h(x)为x点到b点的最小距离，</li>
+<li>先将其余点到a的最小值求出来（优先队列&#x2F;operator&lt;）</li>
+<li>同时取出优先队列最小的状态，枚举点的出边，对应的子状态计入优先队列</li>
+<li>重复操作,相当于dij</li>
+<li>再次当访问b点达到了k次，完成</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/undefined/road/" data-id="clo44x5g300008wu21zngd473" data-title="最短路（路径规划）" class="article-share-link">Share</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/undefined/pj1/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">项目面试1</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/10/">October 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/09/">September 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/07/">July 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">May 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/03/">March 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/12/">December 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/01/">January 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/06/">June 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">May 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/02/">February 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/undefined/road/">最短路（路径规划）</a>
+          </li>
+        
+          <li>
+            <a href="/undefined/pj1/">项目面试1</a>
+          </li>
+        
+          <li>
+            <a href="/undefined/faceReady/">面试准备</a>
+          </li>
+        
+          <li>
+            <a href="/undefined/vue3.2%E5%90%8E%E5%8F%B0%E7%AE%A1%E7%90%86%E5%BF%83%E5%BE%97/">vue3后台管理系统</a>
+          </li>
+        
+          <li>
+            <a href="/undefined/vue%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B/">vue项目的创建过程</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 桉念<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

@@ -71,6 +71,60 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-关于题目" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/undefined/%E5%85%B3%E4%BA%8E%E9%A2%98%E7%9B%AE/" class="article-date">
+  <time class="dt-published" datetime="2020-08-08T16:00:00.000Z" itemprop="datePublished">2020-08-09</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/undefined/%E5%85%B3%E4%BA%8E%E9%A2%98%E7%9B%AE/">刷题1</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>小红和紫准备玩一个游戏。她们拿到了一个只包含小写字母的字符串 s。两人轮流将一个小写字母添加到一个新串t的结尾，必须保证t时刻都是s的一个子序列。谁先无法操作则输掉游戏。t初始是一个空串。小红先手添加，假设两人都足够聪明，请问谁最终能获得胜利？ <a target="_blank" rel="noopener" href="https://ac.nowcoder.com/acm/contest/28335/E">🔗</a></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">	<span class="type">int</span> i,j=s.<span class="built_in">length</span>()<span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">for</span>(i=j<span class="number">-1</span>;i &gt;= <span class="number">0</span>;i--)&#123;<span class="comment">//注意i大于等于0</span></span><br><span class="line">        <span class="keyword">if</span>(s[i]==s[j])j=i<span class="number">-1</span>,i=j;	&#125;</span><br><span class="line">    <span class="keyword">if</span>(j==<span class="number">-1</span>)cout&lt;&lt;<span class="string">&quot;yukari&quot;</span>;</span><br><span class="line">    <span class="keyword">else</span> cout&lt;&lt;<span class="string">&quot;kou&quot;</span>;</span><br><span class="line">最后一个<span class="string">&#x27;b&#x27;</span>，谁的 t 串添加到这里谁就赢了。那么字符串标记为afnabasfoa[b]afnabasfoa[b]。其中中括号为必胜区间。</span><br><span class="line"><span class="comment">//ab cabc 取了b，无论选cab中的谁都没办法结束   是要赢只能选那个必胜区间，否则根本没法</span></span><br><span class="line">那么，这个 b 到上一个 b 之间所有的字母都是必败的。因为如果某人“不小心”取到了这些字母中的任意一个，对方只要在后面加一个 <span class="string">&#x27;b&#x27;</span> ，就直接到了最后一个 b 了。</span><br><span class="line"></span><br><span class="line">因此，第五个字母 <span class="string">&#x27;b&#x27;</span> 后面这些字母都是必败的。字符串标记为 <span class="built_in">afna</span>(basfoa)[b]<span class="built_in">afna</span>(basfoa)[b]。其中小括号为必败区间。</span><br><span class="line"></span><br><span class="line">那么第四个字母<span class="string">&#x27;a&#x27;</span>就是必胜的，因为只要某人取到了这个 a ，对方就不得不取后面的小括号区间的某个字母，导致失败。</span><br><span class="line"></span><br><span class="line">以此类推，字符串可以标记为 (afn)[a](basfoa)[b](afn)[a](basfoa)[b]。标记的逻辑是：最后一个字母 chrchr 为必胜，那么找到它前面离它最近的那个 chrchr ，这段区间为必败。必败区间前面的那个字母为必胜，以此类推，标记出所有区间。</span><br><span class="line"></span><br><span class="line">那么怎么评定胜负的标准呢？很简单，若第一个字母在必败区间，那么小红必败。否则小红必胜，因为小红可以直接取到第一个必败区间前面的那一个字母，迫使紫m去取必败区间。</span><br><span class="line">    </span><br><span class="line">如果要求每次添加的时候t都是s的子串，解法是后缀自动机next指针dag图上求sg函数</span><br></pre></td></tr></table></figure>
+
+<p>炸鸡块君和同学们一共n个人去学校附近玩耍，先让m个人带校园卡进入学校，再派一个人带着所有m张校园卡出来，重复上述过程，直到所有人进入学校。 </p>
+<p>  假设从外面进入学校和从校内出来到校外都需要花费一个单位的时间，求所有人都进入学校最少需要花费几个单位的时间。<a target="_blank" rel="noopener" href="https://ac.nowcoder.com/acm/contest/23106/E">🔗</a></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">		<span class="keyword">if</span>(n &gt; <span class="number">1</span> &amp;&amp; m == <span class="number">1</span>) &#123;</span><br><span class="line">            cout &lt;&lt; <span class="number">-1</span> &lt;&lt; endl;</span><br><span class="line">                <span class="keyword">continue</span>;	&#125;</span><br><span class="line">        <span class="keyword">if</span>(n &lt;= m)&#123;</span><br><span class="line">            cout &lt;&lt; <span class="number">1</span> &lt;&lt; endl;</span><br><span class="line">            <span class="keyword">continue</span>;	&#125;</span><br><span class="line">        ans = <span class="built_in">ceil</span>(((<span class="type">double</span>)(n - <span class="number">1</span>)) / (m<span class="number">-1</span>));<span class="comment">//之所以不是n/m-1 例如5 2 =&gt; 7 //必须往大了的去取整，时间毕竟是个整数，具体还是看要求</span></span><br><span class="line">        cout &lt;&lt; ans * <span class="number">2</span> - <span class="number">1</span> &lt;&lt; endl;</span><br><span class="line">就去硬模拟，不对一定有不对的地方，先改ll， 奇数奇数 奇数偶数 偶数奇数 奇数偶数 这样去试</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://www.acwing.com/problem/content/1764/">逆洗牌🔗</a></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; ++i) &#123;</span><br><span class="line">	cin &gt;&gt; tem;		mp[tem] = i;	&#125;<span class="comment">//</span></span><br><span class="line">string temp;</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; ++i) 	cin &gt;&gt; s[i];			</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; ++i) 	t[mp[mp[mp[i]]]] = s[i];<span class="comment">//</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; ++i)	cout &lt;&lt; t[i] &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+
+<h2 id="一定要抽象问题！！！"><a href="#一定要抽象问题！！！" class="headerlink" title="一定要抽象问题！！！"></a>一定要抽象问题！！！</h2><p>状压dp: <a target="_blank" rel="noopener" href="https://ac.nowcoder.com/acm/contest/11230/F">https://ac.nowcoder.com/acm/contest/11230/F</a></p>
+<p>贪心： <a target="_blank" rel="noopener" href="https://ac.nowcoder.com/acm/contest/11230/E">https://ac.nowcoder.com/acm/contest/11230/E</a></p>
+<p>定理：当且仅当一个数组a1,a2,…,an满足以下两个约束条件时，它可以通过一连串的操作被完全删除。</p>
+<p>n是偶数</p>
+<p>数组中任何元素的最大频率最多为n&#x2F;2。</p>
+<p>本题需要取模，而期望值并不一定是整数，所以要用到逆元和快速幂</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/undefined/%E5%85%B3%E4%BA%8E%E9%A2%98%E7%9B%AE/" data-id="clnx7gbvv000hm4u2g92k42jb" data-title="刷题1" class="article-share-link">Share</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-对拍" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/undefined/%E5%AF%B9%E6%8B%8D/" class="article-date">
@@ -147,6 +201,10 @@
       <ul>
         
           <li>
+            <a href="/undefined/road/">最短路（路径规划）</a>
+          </li>
+        
+          <li>
             <a href="/undefined/pj1/">项目面试1</a>
           </li>
         
@@ -160,10 +218,6 @@
         
           <li>
             <a href="/undefined/vue%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B/">vue项目的创建过程</a>
-          </li>
-        
-          <li>
-            <a href="/undefined/joisc2014/">2882. 「JOISC 2014 Day4」两个人的星座</a>
           </li>
         
       </ul>
