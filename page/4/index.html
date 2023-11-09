@@ -71,6 +71,78 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-STL总结" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/undefined/STL%E6%80%BB%E7%BB%93/" class="article-date">
+  <time class="dt-published" datetime="2021-06-08T16:00:00.000Z" itemprop="datePublished">2021-06-09</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/undefined/STL%E6%80%BB%E7%BB%93/">对拍</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="STL总结"><a href="#STL总结" class="headerlink" title="STL总结"></a>STL总结</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">迭代器例子：`</span><br><span class="line">set&lt;<span class="type">int</span>&gt;:: iterator it;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span>(it = x.<span class="built_in">begin</span>(); it != x.<span class="built_in">end</span>(); ++it)</span><br><span class="line">		 x.<span class="built_in">rbegin</span>();	  x.rend;  ++	 (反向迭代器)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">auto</span> w: x)</span><br></pre></td></tr></table></figure>
+
+<p>排序： <code>sort(v.begin(), v.end())</code>  （包括字母）（<code>less&lt;int&gt;()</code> &#x2F; <code>greater&lt;int&gt;()</code>）</p>
+<h3 id="vector"><a href="#vector" class="headerlink" title="vector"></a>vector</h3><p><code>vector&lt;int&gt; a(n + 1);</code>	能先开辟先开辟，如果输入失败又可能这里出问题了</p>
+<p><code>vector&lt;int&gt; b = a;</code>	定义的时候等于，否则可能会出问题</p>
+<h3 id="map"><a href="#map" class="headerlink" title="map"></a>map</h3><p>默认key从小到大排序</p>
+<p>自定义按value :sort  <code>cmp(pair&lt;int, int&gt;a, pair&lt;int, int&gt;b)  return a.second &lt; b.second;</code></p>
+<p>获取最大值： <code>auto i = max_element(t.begin(), t.end(), cmp)</code> <algorithm> (还有<code>min_element</code>)</p>
+<p><code>map&lt;int, set&lt;string&gt;&gt; m;</code></p>
+<p><code>word[len] = set&lt;string&gt;();</code> (只是创建空间， 会重置原数据)</p>
+<p>返回出现次数：<code>m.count(length)</code></p>
+<p>可以mp.first(); mp.second();</p>
+<h3 id="pair"><a href="#pair" class="headerlink" title="pair"></a>pair</h3><p>先比较第一个，第一个相同再比较第二个</p>
+<p>当想插入两个： <code>q.push(make_pair(0, 0));</code></p>
+<h3 id="string"><a href="#string" class="headerlink" title="string"></a>string</h3><p>大小转 小写：<code>transform(s.begin(), s.end(), s.begin(),tolower)</code></p>
+<p>小写转大写：<code>toupper</code></p>
+<p>有空格：<code>getline(cin, s);</code></p>
+<p><code>s.substr(0，n)</code>: 从1开始数n个</p>
+<p><code>s.reverse(s.begin(), s.end())</code> : 字符串翻转</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">s.<span class="built_in">insert</span>(pos,  string, pos1, size_n) : 从pos1开始数的第n个字符插在pos前</span><br><span class="line">s.<span class="built_in">insert</span>(pos, n, <span class="type">char</span> c) : 在下标为pos前插入n个字符<span class="built_in">c</span> (n个相同的)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.<span class="built_in">count</span>(begin, end, <span class="string">&quot;s&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="set"><a href="#set" class="headerlink" title="set"></a>set</h3><p>去重 + 自动排序</p>
+<p>multiset： 不去重（可以删除某个点）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">s.erase(pos) 删除pos迭代器所选元素</span><br><span class="line">s.erase(x.begin(), x.end()) 删除[begin, end)内所有元素</span><br><span class="line">s.erase(elem) 删除值为elem的元素</span><br></pre></td></tr></table></figure>
+
+<p>set.count(string s) ： set内有几个与s相同的  &#x2F;&#x2F;<strong>string同样可用</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">set.<span class="built_in">count</span>(begin, end, <span class="string">&quot;s&quot;</span>);</span><br><span class="line">set.<span class="built_in">count</span>(<span class="string">&quot;s&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="queue"><a href="#queue" class="headerlink" title="queue"></a>queue</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">queue&lt;pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt;&gt; q;</span><br><span class="line">q.<span class="built_in">insert</span>(&#123;a, b&#125;);</span><br><span class="line">q.<span class="built_in">pop</span>();</span><br><span class="line"><span class="type">int</span> c = q.<span class="built_in">front</span>().first;</span><br><span class="line"><span class="type">int</span> d = q.<span class="built_in">front</span>().second;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/undefined/STL%E6%80%BB%E7%BB%93/" data-id="cloqvzf5p0000g8u26bt175zy" data-title="对拍" class="article-share-link">Share</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-STL关于50条总结" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/undefined/STL%E5%85%B3%E4%BA%8E50%E6%9D%A1%E6%80%BB%E7%BB%93/" class="article-date">
@@ -315,7 +387,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/10/">October 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/09/">September 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/07/">July 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">May 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/03/">March 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/12/">December 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/01/">January 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/06/">June 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">May 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/02/">February 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/11/">November 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/10/">October 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/09/">September 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/07/">July 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">May 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/03/">March 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/12/">December 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/01/">January 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/06/">June 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">May 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/02/">February 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a></li></ul>
     </div>
   </div>
 
@@ -326,6 +398,10 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/undefined/workOne/">实习1</a>
+          </li>
         
           <li>
             <a href="/undefined/bagT/">bagT</a>
@@ -341,10 +417,6 @@
         
           <li>
             <a href="/undefined/pj1/">项目面试1</a>
-          </li>
-        
-          <li>
-            <a href="/undefined/faceReady/">面试准备</a>
           </li>
         
       </ul>
